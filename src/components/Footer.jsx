@@ -1,152 +1,78 @@
-import { motion } from 'framer-motion'
-import { Instagram, Facebook, Twitter, Youtube, Linkedin } from 'lucide-react'
+import { Smartphone, Phone, Instagram } from 'lucide-react'
 
-const links = {
-  Company: [
-    { label: 'About',            href: '#about'   },
-    { label: 'Features',         href: '#features' },
-    { label: 'Tournaments',      href: '#tournaments' },
-    { label: 'Auction System',   href: '#auction'  },
-  ],
-  'For Owners': [
-    { label: 'Register Turf',    href: '#owners'   },
-    { label: 'Owner Dashboard',  href: '#owners'   },
-    { label: 'Revenue Insights', href: '#owners'   },
-    { label: 'QR Payments',      href: '#owners'   },
-  ],
-  Legal: [
-    { label: 'Privacy Policy',      href: '#' },
-    { label: 'Terms & Conditions',  href: '#' },
-    { label: 'Refund Policy',       href: '#' },
-    { label: 'Cookie Policy',       href: '#' },
-  ],
-  Support: [
-    { label: 'Contact',          href: '#contact'  },
-    { label: 'FAQ',              href: '#faq'      },
-    { label: 'WhatsApp',         href: 'https://wa.me/919876543210' },
-    { label: 'Email Us',         href: 'mailto:hello@sportverse.in' },
-  ],
-}
-
-const socials = [
-  { icon: Instagram, href: '#', label: 'Instagram', color: '#E1306C' },
-  { icon: Facebook,  href: '#', label: 'Facebook',  color: '#1877F2' },
-  { icon: Twitter,   href: '#', label: 'Twitter',   color: '#1DA1F2' },
-  { icon: Youtube,   href: '#', label: 'YouTube',   color: '#FF0000' },
-  { icon: Linkedin,  href: '#', label: 'LinkedIn',  color: '#0A66C2' },
-]
-
-/**
- * Footer – logo, link columns, social icons, copyright.
- */
-export default function Footer() {
+export default function Footer({ onDownloadClick }) {
   const handleNav = (href) => {
-    if (href.startsWith('#')) {
-      document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
-    }
+    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
-    <footer
-      className="relative pt-16 pb-8 overflow-hidden"
-      style={{ background: '#080C14', borderTop: '1px solid rgba(255,255,255,0.06)' }}
-      role="contentinfo"
-    >
-      {/* Subtle gradient top */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(37,99,235,0.4), rgba(16,185,129,0.4), transparent)' }}
-        aria-hidden="true"
-      />
-
-      <div className="container-custom">
-
-        {/* Top row */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-10 pb-12 border-b border-white/[0.06]">
-
-          {/* Brand column */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-2">
-            {/* Logo */}
-            <div className="mb-5">
-              <img
-                src="/SportVerse.png"
-                alt="SportVerse"
-                className="h-14 w-auto object-contain"
-                style={{ filter: 'drop-shadow(0 2px 10px rgba(16,185,129,0.25))' }}
-              />
-            </div>
-
-
-            <p className="text-white/50 text-sm leading-relaxed mb-6 max-w-xs">
-              India's smartest sports booking platform for players, teams, turf owners, and
-              tournament organizers.
+    <footer className="sv-footer">
+      <div className="container-xl">
+        <div className="row g-4">
+          <div className="col-lg-4">
+            <a href="#home" onClick={(e) => { e.preventDefault(); handleNav('#home') }} className="d-inline-block mb-3">
+              <img src="/SportVerse.png" alt="SportVerse" style={{ height: 40 }} />
+            </a>
+            <p className="fs-7 sv-text-muted mb-3" style={{ maxWidth: 320 }}>
+              India's all-in-one sports booking, tournament management, and player auction platform. Book turfs, manage teams, track scores.
             </p>
-
-            {/* Socials */}
-            <div className="flex gap-2.5">
-              {socials.map(({ icon: Icon, href, label, color }) => (
-                <motion.a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.15, y: -2 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="w-9 h-9 rounded-xl glass flex items-center justify-center"
-                  style={{ border: '1px solid rgba(255,255,255,0.1)' }}
-                  aria-label={label}
-                >
-                  <Icon size={15} style={{ color }} />
-                </motion.a>
-              ))}
+            <div className="d-flex gap-2">
+              <a
+                href="https://www.instagram.com/sportverse.in?igsh=M3NrOXB2Y28ydTc1&utm_source=qr"
+                target="_blank"
+                rel="noreferrer"
+                className="sv-contact-icon-wrap"
+                style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+                aria-label="Instagram"
+              >
+                <Instagram size={16} className="text-white-50" />
+              </a>
+              <a
+                href="tel:+918428676150"
+                className="sv-contact-icon-wrap"
+                style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+                aria-label="Phone"
+              >
+                <Phone size={16} className="text-white-50" />
+              </a>
             </div>
           </div>
 
-          {/* Link columns */}
-          {Object.entries(links).map(([heading, items]) => (
-            <div key={heading}>
-              <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">
-                {heading}
-              </p>
-              <ul className="space-y-2.5">
-                {items.map(({ label, href }) => (
-                  <li key={label}>
-                    {href.startsWith('#') ? (
-                      <button
-                        onClick={() => handleNav(href)}
-                        className="text-sm text-white/55 hover:text-white transition-colors duration-200 cursor-pointer text-left"
-                      >
-                        {label}
-                      </button>
-                    ) : (
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-white/55 hover:text-white transition-colors duration-200"
-                      >
-                        {label}
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className="col-6 col-md-3 col-lg-2">
+            <h4 className="fs-6 fw-bold text-white mb-3">Quick Links</h4>
+            <a href="#home" onClick={(e) => { e.preventDefault(); handleNav('#home') }} className="sv-footer-link">Home</a>
+            <a href="#features" onClick={(e) => { e.preventDefault(); handleNav('#features') }} className="sv-footer-link">Features</a>
+            <a href="#how-it-works" onClick={(e) => { e.preventDefault(); handleNav('#how-it-works') }} className="sv-footer-link">How It Works</a>
+            <a href="#tournaments" onClick={(e) => { e.preventDefault(); handleNav('#tournaments') }} className="sv-footer-link">Tournaments</a>
+          </div>
+
+          <div className="col-6 col-md-3 col-lg-2">
+            <h4 className="fs-6 fw-bold text-white mb-3">For Business</h4>
+            <a href="#owners" onClick={(e) => { e.preventDefault(); handleNav('#owners') }} className="sv-footer-link">Turf Owners</a>
+            <a href="#auction" onClick={(e) => { e.preventDefault(); handleNav('#auction') }} className="sv-footer-link">Player Auction</a>
+            <a href="#contact" onClick={(e) => { e.preventDefault(); handleNav('#contact') }} className="sv-footer-link">Partner With Us</a>
+            <a href="#faq" onClick={(e) => { e.preventDefault(); handleNav('#faq') }} className="sv-footer-link">FAQ</a>
+          </div>
+
+          <div className="col-md-6 col-lg-4">
+            <h4 className="fs-6 fw-bold text-white mb-3">Get the App</h4>
+            <p className="fs-7 sv-text-muted mb-3">
+              Download SportVerse on Android and iOS to book turfs and join tournaments on the go.
+            </p>
+            <button onClick={onDownloadClick} className="sv-btn sv-btn-primary">
+              <Smartphone size={16} />
+              Download SportVerse App
+            </button>
+          </div>
         </div>
 
-        {/* Bottom row */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/30">
-            © 2026 SportVerse. All rights reserved.
-          </p>
-          <p className="text-xs text-white/25">
-            Made with ❤️ by{' '}
-            <span className="text-white/50 font-medium">Decolz</span>
-          </p>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs text-white/30">All systems operational</span>
+        <hr className="sv-footer-divider" />
+
+        <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 fs-7 sv-text-dim">
+          <p className="mb-0">© {new Date().getFullYear()} SportVerse Technologies Pvt. Ltd. All rights reserved.</p>
+          <div className="d-flex gap-4">
+            <a href="#" className="sv-footer-link mb-0">Privacy Policy</a>
+            <a href="#" className="sv-footer-link mb-0">Terms of Service</a>
           </div>
         </div>
       </div>

@@ -1,304 +1,284 @@
 import { motion } from 'framer-motion'
-import { Smartphone, MapPin, Trophy, CheckCircle2, Activity, Users } from 'lucide-react'
+import { Smartphone, MapPin, Trophy, CheckCircle2, Activity, Users, Award, Zap, Target } from 'lucide-react'
 import AnimatedBlobs from '../components/AnimatedBlobs'
-import { fadeUp, zoomIn, containerVariants } from '../utils/animations'
+import { zoomIn } from '../utils/animations'
 
-/* ── Floating UI Card ── */
-function FloatingCard({ children, className = '', delay = 0, floatClass = 'animate-float' }) {
+function FloatingCard({ children, style = {}, delay = 0, floatClass = 'sv-float' }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.85, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ delay, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className={`glass-strong rounded-2xl px-4 py-3 shadow-2xl ${floatClass} ${className}`}
-      style={{ minWidth: 190 }}
+      className={`sv-float-card ${floatClass}`}
+      style={style}
     >
       {children}
     </motion.div>
   )
 }
 
-/* ── Sport Icon Orb ── */
-function SportOrb({ emoji, label, color, delay = 0 }) {
+function SportOrb({ icon: Icon, label, color, delay = 0 }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5 }}
-      whileHover={{ scale: 1.12, rotate: 4 }}
-      className="flex flex-col items-center gap-2 cursor-default"
+      className="sv-sport-orb"
     >
-      <div
-        className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-lg"
-        style={{ background: color }}
-      >
-        {emoji}
+      <div className="sv-sport-orb-inner" style={{ background: color }}>
+        <Icon size={16} className="text-white" />
       </div>
-      <span className="text-white/55 text-xs font-medium tracking-wide">{label}</span>
+      <span>{label}</span>
     </motion.div>
   )
 }
 
-/**
- * Hero Section – fully responsive, perfect alignment.
- */
-export default function HeroSection() {
+export default function HeroSection({ onDownloadClick }) {
   const handleScroll = (id) =>
     document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' })
 
   const sports = [
-    { emoji: '🏏', label: 'Cricket',    color: 'rgba(37,99,235,0.35)',  delay: 0.95 },
-    { emoji: '⚽', label: 'Football',   color: 'rgba(16,185,129,0.35)', delay: 1.05 },
-    { emoji: '🏸', label: 'Badminton',  color: 'rgba(245,158,11,0.35)', delay: 1.15 },
-    { emoji: '🏓', label: 'Pickleball', color: 'rgba(139,92,246,0.35)', delay: 1.25 },
-    { emoji: '🏀', label: 'Basketball', color: 'rgba(239,68,68,0.35)',   delay: 1.35 },
+    { icon: Trophy,   label: 'Cricket',    color: 'rgba(59,130,246,0.35)',  delay: 0.6 },
+    { icon: Activity, label: 'Football',   color: 'rgba(16,185,129,0.35)', delay: 0.7 },
+    { icon: Award,    label: 'Badminton',  color: 'rgba(245,158,11,0.35)', delay: 0.8 },
+    { icon: Zap,      label: 'Pickleball', color: 'rgba(139,92,246,0.35)', delay: 0.9 },
+    { icon: Target,   label: 'Basketball', color: 'rgba(239,68,68,0.35)',   delay: 1.0 },
   ]
 
   return (
-    <section
-      id="home"
-      className="relative min-h-screen flex items-center overflow-hidden pt-20"
-      aria-label="Hero section"
-    >
-      {/* ── Background ── */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse 90% 70% at 50% -10%, rgba(37,99,235,0.18) 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 85% 90%, rgba(16,185,129,0.12) 0%, transparent 65%), #0D1117',
-        }}
-        aria-hidden="true"
-      />
+    <section id="home" className="sv-hero position-relative">
+      <div className="sv-hero-bg" aria-hidden="true" />
       <AnimatedBlobs variant="default" />
+      <div className="sv-grid-overlay" aria-hidden="true" />
 
-      {/* Grid overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.025] pointer-events-none"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
-          backgroundSize: '64px 64px',
-        }}
-        aria-hidden="true"
-      />
+      <div className="container-xl position-relative z-10 w-100">
+        <div className="row align-items-center g-5">
 
-      <div className="container-custom relative z-10 w-full py-16 lg:py-24">
-        <div className="grid lg:grid-cols-2 gap-12 xl:gap-20 items-center">
-
-          {/* ══════════════════════════════
-              LEFT – Text content
-          ══════════════════════════════ */}
-          <div className="flex flex-col items-start">
-
-            {/* Badge */}
+          {/* Left Column */}
+          <div className="col-lg-6 d-flex flex-column align-items-start">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white/10 text-sm font-medium mb-8"
+              className="sv-hero-badge"
             >
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="sv-live-dot" style={{ background: '#34D399' }} />
               🇮🇳 India's Smartest Sports Platform
             </motion.div>
 
             {/* Headline */}
             <motion.h1
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="text-hero text-white mb-6 w-full"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="sv-hero-title text-white mb-4 w-100"
             >
-              <motion.span variants={fadeUp} className="block">Book.</motion.span>
-              <motion.span variants={fadeUp} className="block gradient-text">Play.</motion.span>
-              <motion.span variants={fadeUp} className="block">Compete.</motion.span>
+              <span className="d-block text-white">Book.</span>
+              <span className="d-block sv-gradient-text">Play.</span>
+              <span className="d-block text-white">Compete.</span>
             </motion.h1>
 
-            {/* Sub-heading */}
+            {/* Paragraph */}
             <motion.p
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.42, duration: 0.6 }}
-              className="text-white/60 text-base sm:text-lg leading-relaxed mb-10 max-w-[520px]"
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="fs-5 text-white-50 mb-4"
+              style={{ maxWidth: 520, lineHeight: 1.72, color: 'rgba(255,255,255,0.7)' }}
             >
               SportVerse makes booking turfs, joining tournaments, tracking live scores,
               managing teams, participating in auctions, and organizing sports events{' '}
-              <span className="text-white font-semibold">simple, fast, and reliable.</span>
+              <strong className="text-white fw-semibold">simple, fast, and reliable.</strong>
             </motion.p>
 
-            {/* CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55, duration: 0.55 }}
-              className="flex flex-wrap gap-4 mb-12"
+              transition={{ delay: 0.35, duration: 0.55 }}
+              className="d-flex flex-wrap gap-3 mb-5"
             >
-              <motion.button
-                whileHover={{ scale: 1.05, boxShadow: '0 12px 40px rgba(37,99,235,0.5)' }}
-                whileTap={{ scale: 0.96 }}
-                onClick={() => handleScroll('#download')}
-                id="hero-download-btn"
-                className="btn-primary"
-                aria-label="Download SportVerse App"
+              <button
+                onClick={onDownloadClick}
+                className="sv-btn sv-btn-primary"
               >
                 <Smartphone size={17} />
                 Download App
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.96 }}
+              </button>
+              <button
                 onClick={() => handleScroll('#features')}
-                id="hero-features-btn"
-                className="btn-secondary"
-                aria-label="Explore Features"
+                className="sv-btn sv-btn-outline"
               >
                 Explore Features →
-              </motion.button>
+              </button>
             </motion.div>
 
-            {/* Sports orbs row */}
-            <div className="flex flex-wrap gap-5 sm:gap-6">
+            <div className="d-flex flex-wrap gap-4">
               {sports.map((s) => (
                 <SportOrb key={s.label} {...s} />
               ))}
             </div>
           </div>
 
-          {/* ══════════════════════════════
-              RIGHT – Floating cards visual
-          ══════════════════════════════ */}
-          <div className="hidden lg:flex items-center justify-center relative" style={{ minHeight: 520 }}>
+          {/* Mobile Right Column: Clean Grid Layout */}
+          <div className="col-lg-6 d-lg-none mt-4">
+            <div className="row g-3">
+              <div className="col-6">
+                <div className="sv-card p-3">
+                  <div className="d-flex align-items-center gap-2 mb-1">
+                    <MapPin size={16} className="text-primary" />
+                    <span className="fs-7 fw-bold text-white">Nearby Turf</span>
+                  </div>
+                  <p className="fs-7 text-success mb-0 fw-semibold">Green Arena</p>
+                  <p className="fs-7 sv-text-dim mb-0" style={{ fontSize: 11 }}>0.4 km · Available</p>
+                </div>
+              </div>
+              <div className="col-6">
+                <div className="sv-card p-3">
+                  <div className="d-flex align-items-center gap-2 mb-1">
+                    <Trophy size={16} className="text-warning" />
+                    <span className="fs-7 fw-bold text-white">Tournament</span>
+                  </div>
+                  <p className="fs-7 text-danger mb-0 fw-bold">City League S2</p>
+                  <p className="fs-7 sv-text-dim mb-0" style={{ fontSize: 11 }}>🔴 LIVE NOW</p>
+                </div>
+              </div>
+              <div className="col-6">
+                <div className="sv-card p-3">
+                  <div className="d-flex align-items-center gap-2 mb-1">
+                    <CheckCircle2 size={16} className="text-success" />
+                    <span className="fs-7 fw-bold text-white">Booked!</span>
+                  </div>
+                  <p className="fs-7 text-white mb-0 fw-semibold">6:00 - 7:00 PM</p>
+                  <p className="fs-7 sv-text-dim mb-0" style={{ fontSize: 11 }}>Sunday Slot</p>
+                </div>
+              </div>
+              <div className="col-6">
+                <div className="sv-card p-3">
+                  <div className="d-flex align-items-center gap-2 mb-1">
+                    <Activity size={16} className="text-info" />
+                    <span className="fs-7 fw-bold text-white">Live Score</span>
+                  </div>
+                  <p className="fs-7 text-primary mb-0 fw-bold">156/4 (18.2 ov)</p>
+                  <p className="fs-7 sv-text-dim mb-0" style={{ fontSize: 11 }}>RRR: 7.8</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-            {/* Central turf card */}
+          {/* Desktop Right Column: Floating Field Showcase */}
+          <div className="col-lg-6 d-none d-lg-flex justify-content-center position-relative" style={{ minHeight: 520 }}>
+            {/* Field Illustration */}
             <motion.div
               variants={zoomIn}
               initial="hidden"
               animate="visible"
               transition={{ delay: 0.4 }}
-              className="absolute inset-12 rounded-3xl overflow-hidden"
+              className="position-absolute overflow-hidden rounded-sv-lg"
               style={{
-                background:
-                  'linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(37,99,235,0.12) 100%), #111827',
-                border: '1px solid rgba(255,255,255,0.08)',
-                boxShadow: '0 24px 60px rgba(0,0,0,0.4)',
+                top: 40, bottom: 40, left: 40, right: 40,
+                background: 'linear-gradient(145deg, rgba(16,185,129,0.1) 0%, rgba(59,130,246,0.1) 100%), #111827',
+                border: '1px solid rgba(255,255,255,0.09)',
+                boxShadow: '0 32px 80px rgba(0,0,0,0.5)',
               }}
             >
-              {/* Turf field illustration */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative w-60 h-40">
-                  <div className="absolute inset-0 border-2 border-white/15 rounded-xl" />
-                  <div className="absolute inset-0 border border-white/08 rounded-xl m-5" />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 border border-white/15 rounded-full" />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-green-400 rounded-full shadow-lg" style={{ boxShadow: '0 0 10px rgba(16,185,129,0.8)' }} />
-                  <div className="absolute top-1/2 -translate-y-1/2 left-0 w-4 h-12 border border-white/20 border-l-0 rounded-r" />
-                  <div className="absolute top-1/2 -translate-y-1/2 right-0 w-4 h-12 border border-white/20 border-r-0 rounded-l" />
-                </div>
-              </div>
-              <div className="absolute bottom-5 left-1/2 -translate-x-1/2">
-                <div className="px-4 py-1.5 rounded-full glass text-xs text-white/75 font-medium border border-white/12">
-                  ⚡ Premium Sports Turf
+              <div className="position-absolute top-50 start-50 translate-middle">
+                <div className="position-relative" style={{ width: 250, height: 170 }}>
+                  <div className="position-absolute top-0 bottom-0 start-0 end-0 border rounded-3" style={{ borderColor: 'rgba(255,255,255,0.12)' }} />
+                  <div className="position-absolute top-0 bottom-0 start-0 end-0 border rounded-3 m-3" style={{ borderColor: 'rgba(255,255,255,0.07)' }} />
+                  <div className="position-absolute top-50 start-50 translate-middle border rounded-circle" style={{ width: 80, height: 80, borderColor: 'rgba(255,255,255,0.12)' }} />
+                  <div className="position-absolute top-50 start-50 translate-middle rounded-circle bg-success" style={{ width: 10, height: 10, boxShadow: '0 0 14px rgba(16,185,129,0.9)' }} />
                 </div>
               </div>
             </motion.div>
 
-            {/* Floating card – Nearby Turf */}
-            <FloatingCard delay={0.85} className="absolute left-0 top-10">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <MapPin size={15} className="text-white" />
+            {/* Floating Cards */}
+            <FloatingCard delay={0.5} style={{ position: 'absolute', left: 0, top: 10 }}>
+              <div className="d-flex align-items-center gap-3">
+                <div className="sv-icon-box sv-gradient-bg mb-0" style={{ width: 40, height: 40, borderRadius: 12 }}>
+                  <MapPin size={16} className="text-white" />
                 </div>
-                <div className="min-w-0">
-                  <p className="text-[11px] text-white/50 font-medium">Nearby Turf</p>
-                  <p className="text-sm font-semibold text-white leading-tight">Green Arena</p>
-                  <p className="text-[11px] text-green-400 font-medium">0.4 km · Available</p>
+                <div>
+                  <p className="fc-label">Nearby Turf</p>
+                  <p className="fc-title">Green Arena</p>
+                  <p className="fc-sub text-success">0.4 km · Available</p>
                 </div>
               </div>
             </FloatingCard>
 
-            {/* Floating card – Tournament Live */}
-            <FloatingCard delay={0.95} floatClass="animate-float-slow" className="absolute right-0 top-14">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
-                  <Trophy size={15} className="text-yellow-400" />
+            <FloatingCard delay={0.6} floatClass="sv-float-slow" style={{ position: 'absolute', right: 0, top: 20 }}>
+              <div className="d-flex align-items-center gap-3">
+                <div className="sv-icon-box mb-0" style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(245,158,11,0.2)', border: '1px solid rgba(245,158,11,0.35)' }}>
+                  <Trophy size={16} style={{ color: '#FBBF24' }} />
                 </div>
-                <div className="min-w-0">
-                  <p className="text-[11px] text-white/50 font-medium">Tournament</p>
-                  <p className="text-sm font-semibold text-white leading-tight">City League S2</p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
-                    <span className="text-[11px] text-red-400 font-semibold">LIVE</span>
+                <div>
+                  <p className="fc-label">Tournament</p>
+                  <p className="fc-title">City League S2</p>
+                  <div className="d-flex align-items-center gap-1 mt-1">
+                    <span className="sv-live-dot" />
+                    <span className="fc-sub text-danger">LIVE</span>
                   </div>
                 </div>
               </div>
             </FloatingCard>
 
-            {/* Floating card – Booked Successfully */}
-            <FloatingCard delay={1.05} className="absolute left-0 bottom-28">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-green-500/20 border border-green-500/30 flex items-center justify-center flex-shrink-0">
-                  <CheckCircle2 size={15} className="text-green-400" />
+            <FloatingCard delay={0.7} style={{ position: 'absolute', left: 0, bottom: 90 }}>
+              <div className="d-flex align-items-center gap-3">
+                <div className="sv-icon-box mb-0" style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(16,185,129,0.18)', border: '1px solid rgba(16,185,129,0.3)' }}>
+                  <CheckCircle2 size={16} style={{ color: '#34D399' }} />
                 </div>
-                <div className="min-w-0">
-                  <p className="text-[11px] text-green-400 font-semibold">Booked!</p>
-                  <p className="text-sm font-semibold text-white leading-tight">6:00 PM – 7:00 PM</p>
-                  <p className="text-[11px] text-white/45">Sunday, July 27</p>
-                </div>
-              </div>
-            </FloatingCard>
-
-            {/* Floating card – Live Score */}
-            <FloatingCard delay={1.15} floatClass="animate-float-slow" className="absolute right-0 bottom-24">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0">
-                  <Activity size={15} className="text-blue-400" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[11px] text-white/50 font-medium">Live Score 🏏</p>
-                  <p className="text-sm font-bold text-white leading-tight">156/4 (18.2 ov)</p>
-                  <p className="text-[11px] text-blue-400 font-medium">RRR: 7.8</p>
+                <div>
+                  <p className="fc-sub text-success">Booked!</p>
+                  <p className="fc-title">6:00 PM – 7:00 PM</p>
+                  <p className="fc-label">Sunday, July 27</p>
                 </div>
               </div>
             </FloatingCard>
 
-            {/* Floating card – Auction */}
-            <FloatingCard delay={1.25} className="absolute left-1/2 -translate-x-1/2 bottom-4">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
-                  <Users size={15} className="text-purple-400" />
+            <FloatingCard delay={0.8} floatClass="sv-float-slow" style={{ position: 'absolute', right: 0, bottom: 80 }}>
+              <div className="d-flex align-items-center gap-3">
+                <div className="sv-icon-box mb-0" style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(59,130,246,0.18)', border: '1px solid rgba(59,130,246,0.3)' }}>
+                  <Activity size={16} style={{ color: '#60A5FA' }} />
                 </div>
-                <div className="min-w-0">
-                  <p className="text-[11px] text-white/50 font-medium">Player Auction</p>
-                  <p className="text-sm font-semibold text-white leading-tight">Rohit – ₹4.5L</p>
-                  <p className="text-[11px] text-yellow-400 font-bold">🔨 SOLD</p>
+                <div>
+                  <p className="fc-label">Live Score</p>
+                  <p className="fc-title">156/4 (18.2 ov)</p>
+                  <p className="fc-sub text-primary">RRR: 7.8</p>
+                </div>
+              </div>
+            </FloatingCard>
+
+            <FloatingCard delay={0.9} style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', bottom: 10 }}>
+              <div className="d-flex align-items-center gap-3">
+                <div className="sv-icon-box mb-0" style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(139,92,246,0.18)', border: '1px solid rgba(139,92,246,0.3)' }}>
+                  <Users size={16} style={{ color: '#A78BFA' }} />
+                </div>
+                <div>
+                  <p className="fc-label">Player Auction</p>
+                  <p className="fc-title">Rohit – ₹4.5L</p>
+                  <p className="fc-sub text-warning">SOLD</p>
                 </div>
               </div>
             </FloatingCard>
           </div>
         </div>
 
-        {/* ══════════════════════════════
-            Stats Bar
-        ══════════════════════════════ */}
+        {/* Stats Bar */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.4, duration: 0.7 }}
-          className="mt-20 glass rounded-2xl border border-white/08"
+          transition={{ delay: 0.8, duration: 0.7 }}
+          className="sv-stats-bar"
         >
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-white/[0.06]">
+          <div className="row g-0">
             {[
               { value: '500+',  label: 'Turfs Listed'   },
               { value: '10K+',  label: 'Bookings Made'  },
               { value: '200+',  label: 'Tournaments'    },
               { value: '50K+',  label: 'Active Players' },
             ].map((stat) => (
-              <div key={stat.label} className="text-center py-6 px-4">
-                <p
-                  className="text-2xl sm:text-3xl font-bold gradient-text"
-                  style={{ fontFamily: 'Space Grotesk, sans-serif' }}
-                >
-                  {stat.value}
-                </p>
-                <p className="text-sm text-white/50 mt-1 font-medium">{stat.label}</p>
+              <div key={stat.label} className="col-6 col-md-3 sv-stat-item">
+                <div className="sv-stat-num">{stat.value}</div>
+                <div className="sv-stat-label">{stat.label}</div>
               </div>
             ))}
           </div>

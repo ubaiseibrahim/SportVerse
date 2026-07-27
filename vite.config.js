@@ -1,14 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-  ],
-  // Explicitly pre-bundle these to avoid "file does not exist in optimize deps" errors
+  plugins: [react()],
   optimizeDeps: {
     include: [
       'react',
@@ -20,10 +14,11 @@ export default defineConfig({
       'react-countup',
       'react-icons',
       'clsx',
+      'bootstrap',
     ],
   },
   server: {
     port: 5173,
-    host: true, // expose to local network
+    host: true,
   },
 })

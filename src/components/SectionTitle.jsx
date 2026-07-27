@@ -1,40 +1,30 @@
 import { motion } from 'framer-motion'
-import { fadeUp } from '../utils/animations'
 
-/**
- * Reusable section title with animated tag badge and subtitle.
- * title prop supports basic HTML tags (span, br) via dangerouslySetInnerHTML.
- */
 export default function SectionTitle({ tag, title, subtitle, center = true }) {
   return (
     <motion.div
-      variants={fadeUp}
-      initial="hidden"
-      whileInView="visible"
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}
-      className={`mb-14 ${center ? 'text-center' : 'text-left'}`}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className={`mb-5 ${center ? 'text-center' : 'text-start'}`}
     >
       {tag && (
-        <div
-          className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-blue text-blue-400 text-[11px] font-semibold uppercase tracking-[0.12em] mb-5 ${
-            center ? 'mx-auto' : ''
-          }`}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-          {tag}
+        <div className={center ? 'd-flex justify-content-center mb-3' : 'mb-3'}>
+          <span className="sv-tag">
+            <span className="sv-tag-dot" />
+            {tag}
+          </span>
         </div>
       )}
-
       <h2
-        className="text-section-title text-white mb-4"
+        className="sv-section-title text-white mb-3"
         dangerouslySetInnerHTML={{ __html: title }}
       />
-
       {subtitle && (
         <p
-          className={`text-white/58 text-base sm:text-lg leading-relaxed max-w-2xl ${
-            center ? 'mx-auto' : ''
-          }`}
+          className={`fs-6 ${center ? 'mx-auto' : ''}`}
+          style={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.72, maxWidth: 600 }}
         >
           {subtitle}
         </p>
