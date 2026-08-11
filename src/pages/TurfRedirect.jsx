@@ -1,44 +1,41 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Trophy, Smartphone, ArrowRight, Download, Calendar, Shield } from 'lucide-react'
+import { MapPin, ArrowRight, Download } from 'lucide-react'
+import { API_BASE_URL } from '../utils/api'
 
-export default function TournamentRedirect() {
+export default function TurfRedirect() {
   const pathParts = window.location.pathname.split('/').filter(Boolean)
-  const id = pathParts[1]
-  const searchParams = new URLSearchParams(window.location.search)
-  const isInvite = searchParams.get('action') === 'join-team'
-  const isRegister = window.location.pathname.includes('/register')
+  const turfId = pathParts[1]
 
-  const [tournamentData, setTournamentData] = useState(null)
+  const [turfData, setTurfData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.scoreverse.sports'
 
   useEffect(() => {
-    if (!id) {
+    if (!turfId) {
       setLoading(false)
       setError(true)
       return
     }
 
-    const fetchTournament = async () => {
+    const fetchTurf = async () => {
       try {
-        const { API_BASE_URL } = await import('../utils/api')
-        const response = await fetch(`${API_BASE_URL}/tournaments/${id}`)
+        const response = await fetch(`${API_BASE_URL}/turfs/${turfId}`)
         if (!response.ok) throw new Error('Failed to fetch')
         const data = await response.json()
-        setTournamentData(data.data || data)
+        setTurfData(data.data || data)
       } catch (err) {
-        console.error('Error fetching tournament:', err)
+        console.error('Error fetching turf:', err)
         setError(true)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchTournament()
-  }, [id])
+    fetchTurf()
+  }, [turfId])
 
   return (
     <div 
@@ -83,49 +80,29 @@ export default function TournamentRedirect() {
               boxShadow: '0 8px 32px rgba(var(--sv-primary-rgb), 0.2)',
             }}
           >
-            {isInvite ? (
-              <Shield size={44} className="sv-text-primary" />
-            ) : (
-              <Trophy size={44} className="sv-text-primary" />
-            )}
+            <MapPin size={44} className="sv-text-primary" />
           </motion.div>
 
           {loading ? (
-            <p className="text-white">Loading tournament details...</p>
-          ) : error || !tournamentData ? (
+            <p className="text-white">Loading turf details...</p>
+          ) : error || !turfData ? (
             <>
               <h1 className="fw-bold text-white mb-3" style={{ fontSize: '1.75rem', lineHeight: '1.3' }}>
-                {isInvite ? (
-                  <>You're Invited to <span className="sv-text-primary">Join a Team</span>!</>
-                ) : isRegister ? (
-                  <>Register for the <span className="sv-text-primary">Player Pool</span></>
-                ) : (
-                  <>View Tournament on <span className="sv-text-primary">ScoreVerse</span></>
-                )}
+                View Turf on <span className="sv-text-primary">ScoreVerse</span>
               </h1>
               <p className="sv-text-muted fs-6 mb-4 px-md-3" style={{ lineHeight: '1.6' }}>
-                {isInvite 
-                  ? 'A team captain has invited you to join their squad. Download the ScoreVerse app to accept the invitation and start competing.'
-                  : 'Book turfs, manage teams, track live scores, and register for active tournaments directly from our mobile app.'}
+                Book turfs, manage your team, and play matches seamlessly with our mobile app.
               </p>
             </>
           ) : (
             <>
               <h1 className="fw-bold text-white mb-3" style={{ fontSize: '1.75rem', lineHeight: '1.3' }}>
-                {isInvite ? (
-                  <>Join a Team in <span className="sv-text-primary">{tournamentData.name}</span></>
-                ) : isRegister ? (
-                  <>Register for <span className="sv-text-primary">{tournamentData.name}</span></>
-                ) : (
-                  <>{tournamentData.name}</>
-                )}
+                {turfData.name}
               </h1>
-              {tournamentData.organizerName && (
-                <p className="sv-text-muted fs-6 mb-4 px-md-3" style={{ lineHeight: '1.6' }}>
-                  Organized by {tournamentData.organizerName}<br/>
-                  Download ScoreVerse to view the full schedule, register, and track live scores!
-                </p>
-              )}
+              <p className="sv-text-muted fs-6 mb-4 px-md-3" style={{ lineHeight: '1.6' }}>
+                {turfData.location?.city || 'Location unavailable'}<br/>
+                Download ScoreVerse to view amenities, available slots, and book instantly!
+              </p>
             </>
           )}
 
