@@ -27,8 +27,7 @@ export default function AppDownloadModal({ isOpen, onClose }) {
       setLoading(false)
     } catch (err) {
       console.error(err)
-      // Fallback success so user has great UX even if local server fails
-      setSubmitted(true)
+      setError(err.message || 'Something went wrong. Please try again.')
       setLoading(false)
     }
   }
@@ -57,7 +56,7 @@ export default function AppDownloadModal({ isOpen, onClose }) {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="sv-card p-4 p-sm-5 position-relative w-100 overflow-hidden"
-            style={{ maxWidth: 500, background: 'linear-gradient(145deg, #0F172A 0%, #0A0F1C 100%)', border: '1px solid rgba(59,130,246,0.3)', boxShadow: '0 24px 80px rgba(0,0,0,0.6)' }}
+            style={{ maxWidth: 500, background: 'linear-gradient(145deg, #0F172A 0%, #0A0F1C 100%)', border: '1px solid rgba(255,212,0,0.3)', boxShadow: '0 24px 80px rgba(0,0,0,0.6)' }}
           >
             {/* Close button */}
             <button
@@ -73,13 +72,13 @@ export default function AppDownloadModal({ isOpen, onClose }) {
               <div className="text-center py-4">
                 <div
                   className="sv-gradient-bg d-inline-flex align-items-center justify-content-center text-white rounded-circle mb-3"
-                  style={{ width: 64, height: 64, boxShadow: '0 8px 32px rgba(16,185,129,0.4)' }}
+                  style={{ width: 64, height: 64, boxShadow: '0 8px 32px rgba(255,212,0,0.4)' }}
                 >
                   <CheckCircle2 size={36} />
                 </div>
                 <h3 className="fs-4 fw-bold text-white mb-2">You're On The VIP List! 🎉</h3>
                 <p className="fs-6 sv-text-muted mb-4">
-                  Thank you, <strong>{name || 'Sports Fan'}</strong>! We will send you an exclusive early-access notification as soon as the SportVerse app launches on Android & iOS.
+                  Thank you, <strong>{name || 'Sports Fan'}</strong>! We will send you an exclusive early-access notification as soon as the ScoreVerse app launches on Android & iOS.
                 </p>
                 <button onClick={handleClose} className="sv-btn sv-btn-primary w-100">
                   Got It, Thanks!
@@ -111,7 +110,7 @@ export default function AppDownloadModal({ isOpen, onClose }) {
                 </p>
 
                 {error && (
-                  <div className="alert alert-danger fs-7 py-2 px-3 mb-3 text-start" style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#F87171' }}>
+                  <div className="alert alert-danger fs-7 py-2 px-3 mb-3 text-start" style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)', color: '#FFD400' }}>
                     {error}
                   </div>
                 )}

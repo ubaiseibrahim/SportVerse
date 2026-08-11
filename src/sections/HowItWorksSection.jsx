@@ -9,28 +9,28 @@ const steps = [
     icon: Search,
     title: 'Find Turf',
     description: 'Search for turfs near you based on sport, date, time, and location filters.',
-    color: '#3B82F6',
+    color: '#FFD400',
   },
   {
     step: '02',
     icon: CalendarClock,
     title: 'Choose Slot',
     description: 'Pick the perfect slot from real-time availability across your preferred venues.',
-    color: '#8B5CF6',
+    color: '#E6BF00',
   },
   {
     step: '03',
     icon: ShieldCheck,
     title: 'Pay Securely',
     description: 'Pay safely via UPI, cards, or QR. Instant confirmation sent to your phone.',
-    color: '#10B981',
+    color: '#FFD400',
   },
   {
     step: '04',
     icon: PartyPopper,
     title: 'Play & Enjoy',
     description: 'Show your booking QR at the venue and enjoy your game. That simple!',
-    color: '#F59E0B',
+    color: '#FFD400',
   },
 ]
 
@@ -41,17 +41,13 @@ function StepCard({ step, icon: Icon, title, description, color, index, isLast }
         variants={fadeUp}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ delay: index * 0.12 }}
+        viewport={{ once: true, amount: 0.28 }}
+        transition={{ delay: index * 0.1 }}
         className="sv-step-card d-flex flex-column align-items-center"
       >
         <span
           className="sv-step-num"
-          style={{
-            background: `${color}22`,
-            border: `1.5px solid ${color}50`,
-            color,
-          }}
+          style={{ background: `${color}20`, border: `1.5px solid ${color}45`, color }}
         >
           {step}
         </span>
@@ -59,24 +55,29 @@ function StepCard({ step, icon: Icon, title, description, color, index, isLast }
         <div
           className="sv-step-icon-wrap"
           style={{
-            background: `linear-gradient(135deg, ${color}22 0%, ${color}0a 100%)`,
-            border: `1.5px solid ${color}40`,
-            boxShadow: `0 6px 24px ${color}20`,
+            background: `linear-gradient(135deg, ${color}20 0%, ${color}08 100%)`,
+            border: `1.5px solid ${color}35`,
+            boxShadow: `0 8px 28px ${color}22`,
           }}
         >
           <Icon size={30} style={{ color }} />
         </div>
 
-        <h3 className="fs-5 fw-bold text-white mb-2">{title}</h3>
-        <p className="fs-7 sv-text-muted mb-0 leading-relaxed">{description}</p>
+        <h3 className="text-white mb-2" style={{ fontWeight: 700, fontSize: '1.1rem' }}>{title}</h3>
+        <p className="sv-text-muted mb-0 text-center" style={{ fontSize: '0.84rem', lineHeight: 1.68 }}>{description}</p>
       </motion.div>
 
       {!isLast && (
         <div
-          className="d-none d-lg-flex align-items-center justify-content-center position-absolute top-50 start-100 translate-middle z-3"
-          style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}
+          className="d-none d-lg-flex align-items-center justify-content-center position-absolute top-50 start-100 translate-middle"
+          style={{
+            width: 34, height: 34, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            zIndex: 3,
+          }}
         >
-          <ArrowRight size={14} className="text-white-50" />
+          <ArrowRight size={14} style={{ color: 'rgba(255,255,255,0.4)' }} />
         </div>
       )}
     </div>
@@ -86,7 +87,7 @@ function StepCard({ step, icon: Icon, title, description, color, index, isLast }
 export default function HowItWorksSection() {
   return (
     <section id="how-it-works" className="sv-section bg-glow-center">
-      <div className="container-xl position-relative z-10">
+      <div className="container-xl position-relative" style={{ zIndex: 2 }}>
         <SectionTitle
           tag="How It Works"
           title={`Book a Turf in <span class="sv-gradient-text">4 Simple Steps</span>`}
@@ -106,11 +107,12 @@ export default function HowItWorksSection() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="text-center mt-5"
+          className="text-center mt-4"
         >
           <button
             onClick={() => document.querySelector('#download')?.scrollIntoView({ behavior: 'smooth' })}
             className="sv-btn sv-btn-primary"
+            style={{ fontSize: 15, padding: '14px 32px' }}
           >
             Start Booking Now →
           </button>

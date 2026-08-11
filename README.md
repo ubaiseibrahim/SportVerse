@@ -1,4 +1,4 @@
-# SportVerse – India's Smart Sports Booking Platform
+# ScoreVerse – India's Smart Sports Booking Platform
 
 A premium, production-ready React landing website built with:
 - **React 18** + **Vite 5**
@@ -79,4 +79,4 @@ src/
 14. **Contact** – contact cards + form
 15. **Footer** – links + socials + copyright
 
-© 2026 SportVerse. Powered by Decolz.
+© 2026 ScoreVerse. Powered by Decolz.

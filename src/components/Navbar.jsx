@@ -1,25 +1,25 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Smartphone, Home, Star, Trophy, Building2, HelpCircle, Mail } from 'lucide-react'
+import { Menu, X, Smartphone } from 'lucide-react'
 
 const navLinks = [
-  { label: 'Home',        href: '#home',        icon: Home },
-  { label: 'Features',    href: '#features',    icon: Star },
-  { label: 'Tournaments', href: '#tournaments', icon: Trophy },
-  { label: 'Owners',      href: '#owners',      icon: Building2 },
-  { label: 'FAQ',         href: '#faq',         icon: HelpCircle },
-  { label: 'Contact',     href: '#contact',     icon: Mail },
+  { label: 'Home',        href: '#home' },
+  { label: 'Features',    href: '#features' },
+  { label: 'Tournaments', href: '#tournaments' },
+  { label: 'Owners',      href: '#owners' },
+  { label: 'FAQ',         href: '#faq' },
+  { label: 'Contact',     href: '#contact' },
 ]
 
 export default function Navbar({ onDownloadClick }) {
   const [scrolled, setScrolled] = useState(false)
-  const [open, setOpen] = useState(false)
-  const [active, setActive] = useState('#home')
+  const [open, setOpen]         = useState(false)
+  const [active, setActive]     = useState('#home')
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 60)
-      const pos = window.scrollY + 100
+      setScrolled(window.scrollY > 50)
+      const pos = window.scrollY + 120
       navLinks.forEach(({ href }) => {
         const el = document.querySelector(href)
         if (el && el.offsetTop <= pos && el.offsetTop + el.offsetHeight > pos) {
@@ -27,14 +27,19 @@ export default function Navbar({ onDownloadClick }) {
         }
       })
     }
-    window.addEventListener('scroll', onScroll)
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   const handleNav = (href) => {
     setOpen(false)
     setActive(href)
-    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
+    const pathname = window.location.pathname
+    if (pathname !== '/' && pathname !== '/index.html') {
+      window.location.href = '/' + href
+    } else {
+      document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 
   return (
@@ -52,26 +57,30 @@ export default function Navbar({ onDownloadClick }) {
           <a
             href="#home"
             onClick={(e) => { e.preventDefault(); handleNav('#home') }}
-            aria-label="SportVerse Home"
-            style={{ flexShrink: 0 }}
+            aria-label="ScoreVerse Home"
+            style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}
           >
             <img
               src="/SportVerse.png"
-              alt="SportVerse"
-              style={{ height: 44, width: 'auto', filter: 'drop-shadow(0 2px 8px rgba(59,130,246,0.3))' }}
+              alt="ScoreVerse"
+              style={{
+                height: 40, width: 'auto',
+                filter: 'drop-shadow(0 2px 10px rgba(255,212,0,0.35))',
+              }}
             />
           </a>
 
           {/* Desktop nav */}
-          <nav className="d-none d-lg-flex align-items-center gap-1 flex-grow-1 justify-content-center" aria-label="Main navigation">
-            {navLinks.map(({ label, href, icon: Icon }) => (
+          <nav
+            className="d-none d-lg-flex align-items-center gap-1 flex-grow-1 justify-content-center"
+            aria-label="Main navigation"
+          >
+            {navLinks.map(({ label, href }) => (
               <button
                 key={label}
                 onClick={() => handleNav(href)}
-                className={`sv-nav-link border-0 bg-transparent ${active === href ? 'active' : ''}`}
-                style={{ fontFamily: 'var(--font-body)' }}
+                className={`sv-nav-link ${active === href ? 'active' : ''}`}
               >
-                <Icon size={13} />
                 {label}
               </button>
             ))}
@@ -80,13 +89,13 @@ export default function Navbar({ onDownloadClick }) {
           {/* CTA */}
           <div className="d-none d-lg-block" style={{ flexShrink: 0 }}>
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.96 }}
+              whileHover={{ scale: 1.04, y: -1 }}
+              whileTap={{ scale: 0.97 }}
               onClick={onDownloadClick}
               className="sv-btn sv-btn-primary"
               style={{ fontSize: 13, padding: '10px 22px' }}
             >
-              <Smartphone size={15} />
+              <Smartphone size={14} />
               Download App
             </motion.button>
           </div>
@@ -98,7 +107,18 @@ export default function Navbar({ onDownloadClick }) {
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
           >
-            {open ? <X size={20} /> : <Menu size={20} />}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={open ? 'x' : 'menu'}
+                initial={{ opacity: 0, rotate: -90, scale: 0.7 }}
+                animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                exit={{ opacity: 0, rotate: 90, scale: 0.7 }}
+                transition={{ duration: 0.2 }}
+                style={{ display: 'flex' }}
+              >
+                {open ? <X size={20} /> : <Menu size={20} />}
+              </motion.span>
+            </AnimatePresence>
           </button>
         </div>
       </div>
@@ -108,72 +128,77 @@ export default function Navbar({ onDownloadClick }) {
         {open && (
           <motion.div
             key="mobile-menu"
-            initial={{ opacity: 0, y: -16, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -16, filter: 'blur(8px)' }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, y: -12, scale: 0.97, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -12, scale: 0.97, filter: 'blur(8px)' }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="glass-strong"
             style={{
               position: 'absolute',
               top: 'calc(100% + 8px)',
               left: 16, right: 16,
               borderRadius: 20,
-              padding: 16,
-              boxShadow: '0 16px 60px rgba(0,0,0,0.5)',
+              padding: '12px 8px',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06)',
             }}
             role="navigation"
             aria-label="Mobile navigation"
           >
             <div className="d-flex flex-column gap-1">
-              {navLinks.map(({ label, href, icon: Icon }, i) => (
+              {navLinks.map(({ label, href }, i) => (
                 <motion.button
                   key={label}
-                  initial={{ opacity: 0, x: -12 }}
+                  initial={{ opacity: 0, x: -14 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.05 + i * 0.05 }}
+                  transition={{ delay: 0.04 + i * 0.04, duration: 0.35 }}
                   onClick={() => handleNav(href)}
-                  className="border-0 d-flex align-items-center gap-3"
                   style={{
-                    background: active === href ? 'rgba(59,130,246,0.1)' : 'transparent',
-                    color: active === href ? '#fff' : 'rgba(255,255,255,0.72)',
+                    background: active === href ? 'rgba(255,212,0,0.08)' : 'transparent',
+                    color: active === href ? '#fff' : 'rgba(255,255,255,0.7)',
                     borderRadius: 12,
                     padding: '12px 16px',
                     fontFamily: 'var(--font-body)',
                     fontSize: 14,
                     fontWeight: 500,
-                    border: active === href ? '1px solid rgba(59,130,246,0.22)' : '1px solid transparent',
+                    border: active === href ? '1px solid rgba(255,212,0,0.2)' : '1px solid transparent',
                     cursor: 'pointer',
-                    transition: 'all 0.2s',
                     textAlign: 'left',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    transition: 'all 0.2s',
                   }}
                 >
-                  <div style={{
-                    width: 32, height: 32, borderRadius: 10,
-                    background: active === href ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.05)',
-                    color: active === href ? '#10B981' : 'rgba(255,255,255,0.5)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  }}>
-                    <Icon size={15} />
-                  </div>
                   {label}
                   {active === href && (
-                    <div className="ms-auto" style={{ width: 7, height: 7, borderRadius: '50%', background: '#10B981', boxShadow: '0 0 8px rgba(16,185,129,0.8)' }} />
+                    <div style={{
+                      width: 6, height: 6,
+                      borderRadius: '50%',
+                      background: '#FFD400',
+                      boxShadow: '0 0 8px rgba(255,212,0,0.8)',
+                    }} />
                   )}
                 </motion.button>
               ))}
+
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 12, marginTop: 8 }}
+                transition={{ delay: 0.3 }}
+                style={{
+                  borderTop: '1px solid rgba(255,255,255,0.07)',
+                  paddingTop: 10,
+                  marginTop: 6,
+                  paddingLeft: 8, paddingRight: 8,
+                }}
               >
                 <button
-                  onClick={() => { setOpen(false); onDownloadClick(); }}
+                  onClick={() => { setOpen(false); onDownloadClick() }}
                   className="sv-btn sv-btn-primary w-100 justify-content-center"
-                  style={{ padding: '12px 20px' }}
+                  style={{ padding: '12px 20px', borderRadius: 14 }}
                 >
                   <Smartphone size={15} />
-                  Download SportVerse App
+                  Download ScoreVerse
                 </button>
               </motion.div>
             </div>

@@ -1,5 +1,9 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/tournament/:id*", "destination": "/tournament/index.html" },
+    { "source": "/privacy-policy", "destination": "/privacy/index.html" },
+    { "source": "/privacy", "destination": "/privacy/index.html" },
+    { "source": "/terms-and-conditions", "destination": "/terms/index.html" },
+    { "source": "/terms", "destination": "/terms/index.html" }
   ]
 }

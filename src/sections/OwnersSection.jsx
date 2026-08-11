@@ -8,14 +8,14 @@ import AnimatedBlobs from '../components/AnimatedBlobs'
 import { fadeLeft, fadeRight, fadeUp, containerVariants } from '../utils/animations'
 
 const ownerFeatures = [
-  { icon: CalendarCheck, title: 'Manage Bookings',   desc: 'Accept or reschedule bookings with one tap.',                color: '#3B82F6' },
-  { icon: BarChart3,     title: 'Revenue Analytics', desc: 'Track daily, weekly & monthly earnings in detail.',           color: '#10B981' },
-  { icon: Users,         title: 'Customer Mgmt',     desc: 'Know your regulars and keep them coming back.',               color: '#8B5CF6' },
-  { icon: CreditCard,    title: 'Online Payments',   desc: 'Receive payments online. Zero hassle, instant credit.',       color: '#F59E0B' },
-  { icon: QrCode,        title: 'QR Payments',       desc: 'Generate QR codes for on-site quick payments.',               color: '#06B6D4' },
-  { icon: Wifi,          title: 'Live Availability', desc: 'Update slot availability in real time from anywhere.',        color: '#EF4444' },
-  { icon: Star,          title: 'Ratings & Reviews', desc: 'Build trust with verified player reviews.',                   color: '#F97316' },
-  { icon: TrendingUp,    title: 'Booking Analytics', desc: 'Visualise peak hours, popular sports & more.',               color: '#EC4899' },
+  { icon: CalendarCheck, title: 'Manage Bookings',   desc: 'Accept or reschedule bookings with one tap.',                color: '#FFD400' },
+  { icon: BarChart3,     title: 'Revenue Analytics', desc: 'Track daily, weekly & monthly earnings in detail.',           color: '#FFD400' },
+  { icon: Users,         title: 'Customer Mgmt',     desc: 'Know your regulars and keep them coming back.',               color: '#E6BF00' },
+  { icon: CreditCard,    title: 'Online Payments',   desc: 'Receive payments online. Zero hassle, instant credit.',       color: '#FFD400' },
+  { icon: QrCode,        title: 'QR Payments',       desc: 'Generate QR codes for on-site quick payments.',               color: '#FFD400' },
+  { icon: Wifi,          title: 'Live Availability', desc: 'Update slot availability in real time from anywhere.',        color: '#FFD400' },
+  { icon: Star,          title: 'Ratings & Reviews', desc: 'Build trust with verified player reviews.',                   color: '#FFD400' },
+  { icon: TrendingUp,    title: 'Booking Analytics', desc: 'Visualise peak hours, popular sports & more.',               color: '#FFD400' },
 ]
 
 function DashboardMockup() {
@@ -26,26 +26,29 @@ function DashboardMockup() {
     <div className="sv-dashboard">
       <div className="d-flex align-items-center justify-content-between mb-4">
         <div>
-          <p className="fs-7 text-uppercase tracking-wider sv-text-dim fw-bold mb-1">
+          <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }} className="mb-1">
             Owner Dashboard
           </p>
-          <h3 className="fs-5 fw-bold text-white mb-0">
+          <h3 className="text-white mb-0" style={{ fontWeight: 700, fontSize: '1.05rem' }}>
             Greenfield Arena
           </h3>
         </div>
-        <div className="sv-icon-box sv-gradient-bg mb-0" style={{ width: 44, height: 44, borderRadius: 12 }}>
-          <Building2 size={18} className="text-white" />
+        <div
+          className="sv-icon-box sv-gradient-bg mb-0 d-flex align-items-center justify-content-center"
+          style={{ width: 42, height: 42, borderRadius: 12 }}
+        >
+          <Building2 size={16} className="text-dark" />
         </div>
       </div>
 
       <div className="row g-2 mb-4">
         {[
-          { label: 'Today Revenue', value: '₹8,400', color: '#10B981' },
-          { label: 'Bookings',      value: '14',      color: '#3B82F6' },
-          { label: 'Rating',        value: '4.8 ★',   color: '#F59E0B' },
+          { label: 'Today Revenue', value: '₹8,400', color: '#FFD400' },
+          { label: 'Bookings',      value: '14',      color: '#FFD400' },
+          { label: 'Rating',        value: '4.8 ★',   color: '#FFD400' },
         ].map(({ label, value, color }) => (
           <div key={label} className="col-4">
-            <div className="sv-mini-stat" style={{ background: `${color}10`, border: `1px solid ${color}25` }}>
+            <div className="sv-mini-stat" style={{ background: `${color}0e`, border: `1px solid ${color}22` }}>
               <div className="sv-mini-stat-val" style={{ color }}>{value}</div>
               <div className="sv-mini-stat-label">{label}</div>
             </div>
@@ -54,46 +57,48 @@ function DashboardMockup() {
       </div>
 
       <div className="mb-4">
-        <p className="fs-7 text-uppercase tracking-wider sv-text-dim fw-bold mb-3">
+        <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }} className="mb-3">
           Weekly Revenue
         </p>
-        <div className="d-flex align-items-end gap-2" style={{ height: 90 }}>
+        <div className="d-flex align-items-end gap-2" style={{ height: 85 }}>
           {days.map((day, i) => (
             <div key={day} className="flex-grow-1 d-flex flex-column align-items-center gap-1">
               <div
                 className="sv-bar"
                 style={{
                   height: `${values[i]}%`,
-                  background: i === 5 ? 'linear-gradient(180deg, #3B82F6, #10B981)' : 'rgba(59,130,246,0.25)',
+                  background: i === 5
+                    ? 'linear-gradient(180deg, #FFD400, #FFD400)'
+                    : 'rgba(255,212,0,0.18)',
                 }}
               />
-              <span className="fs-7 sv-text-dim" style={{ fontSize: 10 }}>{day}</span>
+              <span style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.4)' }}>{day}</span>
             </div>
           ))}
         </div>
       </div>
 
       <div>
-        <p className="fs-7 text-uppercase tracking-wider sv-text-dim fw-bold mb-2">
+        <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }} className="mb-2">
           Recent Bookings
         </p>
         <div>
           {[
-            { name: 'Arjun S.',  time: '6 PM – 7 PM',  sport: '🏏', status: 'Confirmed' },
-            { name: 'Team FC',   time: '7 PM – 8 PM',  sport: '⚽', status: 'Pending'   },
+            { name: 'Arjun S.',  time: '6 PM – 7 PM', sport: '🏏', status: 'Confirmed' },
+            { name: 'Team FC',   time: '7 PM – 8 PM', sport: '⚽', status: 'Pending'   },
             { name: 'Priya M.', time: '8 PM – 9 PM',  sport: '🏸', status: 'Confirmed' },
           ].map((b) => (
             <div key={b.name} className="sv-booking-row">
-              <span className="fs-5">{b.sport}</span>
+              <span style={{ fontSize: '1.1rem' }}>{b.sport}</span>
               <div className="flex-grow-1 min-w-0">
-                <p className="mb-0 fs-7 fw-bold text-white text-truncate">{b.name}</p>
-                <p className="mb-0 fs-7 sv-text-dim" style={{ fontSize: 11 }}>{b.time}</p>
+                <p className="mb-0 text-white fw-bold text-truncate" style={{ fontSize: '0.82rem' }}>{b.name}</p>
+                <p className="mb-0 sv-text-dim" style={{ fontSize: '0.7rem' }}>{b.time}</p>
               </div>
               <span
                 className="sv-status-pill"
                 style={{
-                  background: b.status === 'Confirmed' ? 'rgba(16,185,129,0.14)' : 'rgba(245,158,11,0.14)',
-                  color:      b.status === 'Confirmed' ? '#34D399' : '#FBBF24',
+                  background: b.status === 'Confirmed' ? 'rgba(255,212,0,0.12)' : 'rgba(251,191,36,0.12)',
+                  color:      b.status === 'Confirmed' ? '#FFD400' : '#FFD400',
                 }}
               >
                 {b.status}
@@ -111,11 +116,11 @@ export default function OwnersSection() {
     <section id="owners" className="sv-section bg-dark-alt">
       <AnimatedBlobs variant="green" />
 
-      <div className="container-xl position-relative z-10">
+      <div className="container-xl position-relative" style={{ zIndex: 2 }}>
         <SectionTitle
           tag="For Turf Owners"
           title={`Grow Your Turf <span class="sv-gradient-text-green">Business</span>`}
-          subtitle="Join hundreds of turf owners already using SportVerse to fill slots, get paid, and delight customers."
+          subtitle="Join hundreds of turf owners already using ScoreVerse to fill slots, get paid, and delight customers."
         />
 
         <div className="row g-5 align-items-start">
@@ -123,7 +128,7 @@ export default function OwnersSection() {
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.08 }}
+            viewport={{ once: true, amount: 0.06 }}
             className="col-lg-6"
           >
             <div className="row row-cols-1 row-cols-sm-2 g-3 mb-4">
@@ -132,15 +137,12 @@ export default function OwnersSection() {
                   <motion.div variants={fadeUp} className="sv-owner-card">
                     <div
                       className="sv-icon-box mb-3"
-                      style={{
-                        width: 38, height: 38, borderRadius: 10,
-                        background: `${color}15`, border: `1.5px solid ${color}28`,
-                      }}
+                      style={{ width: 38, height: 38, borderRadius: 11, background: `${color}14`, border: `1.5px solid ${color}26` }}
                     >
-                      <Icon size={16} style={{ color }} />
+                      <Icon size={15} style={{ color }} />
                     </div>
-                    <h3 className="fs-6 fw-bold text-white mb-1">{title}</h3>
-                    <p className="fs-7 sv-text-muted mb-0 leading-relaxed">{desc}</p>
+                    <h3 className="text-white mb-1" style={{ fontWeight: 700, fontSize: '0.9rem' }}>{title}</h3>
+                    <p className="sv-text-muted mb-0" style={{ fontSize: '0.8rem', lineHeight: 1.65 }}>{desc}</p>
                   </motion.div>
                 </div>
               ))}
@@ -154,7 +156,7 @@ export default function OwnersSection() {
               onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })}
               className="sv-btn sv-btn-green"
             >
-              <Building2 size={17} />
+              <Building2 size={16} />
               Register Your Turf
             </motion.button>
           </motion.div>
@@ -163,7 +165,7 @@ export default function OwnersSection() {
             variants={fadeRight}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
+            viewport={{ once: true, amount: 0.12 }}
             className="col-lg-6"
           >
             <DashboardMockup />

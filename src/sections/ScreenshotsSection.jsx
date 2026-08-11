@@ -14,8 +14,8 @@ const screens = [
         <video
           src="/SportVerse.mp4"
           autoPlay
+          controls
           loop
-          muted
           playsInline
           className="w-100 h-100 position-absolute top-0 start-0"
           style={{ objectFit: 'cover', display: 'block' }}
@@ -30,7 +30,7 @@ const screens = [
           id="video-fallback"
           className="d-none flex-column align-items-center justify-content-center text-center p-3 w-100 h-100 position-relative z-10"
           style={{
-            background: 'linear-gradient(145deg, #1E1B4B 0%, #0F172A 100%)',
+            background: 'linear-gradient(145deg, #1A1500 0%, #0F172A 100%)',
           }}
         >
           <motion.div
@@ -42,7 +42,7 @@ const screens = [
             <Play size={28} className="ms-1 text-white" />
           </motion.div>
           <span className="badge bg-warning text-dark fw-bold mb-2">Mobile Video Ad</span>
-          <h4 className="fs-6 fw-bold text-white mb-1">SportVerse Video Ad</h4>
+          <h4 className="fs-6 fw-bold text-white mb-1">ScoreVerse Video Ad</h4>
           <p className="fs-7 sv-text-muted mb-0" style={{ fontSize: 11 }}>
             Playing <code>SportVerse.mp4</code> live
           </p>
@@ -58,7 +58,7 @@ const screens = [
       <div className="w-100 h-100 overflow-hidden bg-black" style={{ minHeight: 460 }}>
         <img
           src="/home.png"
-          alt="SportVerse Home Screen"
+          alt="ScoreVerse Home Screen"
           className="w-100 h-100"
           style={{ objectFit: 'cover', display: 'block', minHeight: 460 }}
         />
@@ -73,7 +73,7 @@ const screens = [
       <div className="w-100 h-100 overflow-hidden bg-black" style={{ minHeight: 460 }}>
         <img
           src="/turf.png"
-          alt="SportVerse Nearby Turf Screen"
+          alt="ScoreVerse Nearby Turf Screen"
           className="w-100 h-100"
           style={{ objectFit: 'cover', display: 'block', minHeight: 460 }}
         />
@@ -88,7 +88,7 @@ const screens = [
       <div className="w-100 h-100 overflow-hidden bg-black" style={{ minHeight: 460 }}>
         <img
           src="/score.png"
-          alt="SportVerse Live Score Screen"
+          alt="ScoreVerse Live Score Screen"
           className="w-100 h-100"
           style={{ objectFit: 'cover', display: 'block', minHeight: 460 }}
         />
@@ -105,7 +105,7 @@ export default function ScreenshotsSection() {
       <div className="container-xl position-relative z-10">
         <SectionTitle
           tag="Mobile App Showcase"
-          title={`See SportVerse <span class="sv-gradient-text">In Action</span>`}
+          title={`See ScoreVerse <span class="sv-gradient-text">In Action</span>`}
           subtitle="Watch our mobile video ad and explore real app screenshots."
         />
 
@@ -118,9 +118,9 @@ export default function ScreenshotsSection() {
                 onClick={() => setActive(i)}
                 className="sv-btn py-2 px-3 fs-7"
                 style={{
-                  background: active === i ? 'rgba(59,130,246,0.25)' : 'rgba(255,255,255,0.05)',
+                  background: active === i ? 'rgba(255,212,0,0.25)' : 'rgba(255,255,255,0.05)',
                   color: active === i ? '#fff' : 'rgba(255,255,255,0.6)',
-                  border: active === i ? '1px solid rgba(59,130,246,0.45)' : '1px solid rgba(255,255,255,0.08)',
+                  border: active === i ? '1px solid rgba(255,212,0,0.45)' : '1px solid rgba(255,255,255,0.08)',
                 }}
               >
                 <Icon size={14} className="me-1" />

@@ -1,7 +1,5 @@
-// API Base URL - Backend server runs on http://localhost:5001/api
-export const API_BASE_URL = 'http://localhost:5001/api';
-
-// export const API_BASE_URL = 'https://turfbackend-pn8j.onrender.com';
+// export const API_BASE_URL = 'http://localhost:5001/api';
+export const API_BASE_URL = 'https://api.scoreverse.in/api';
 
 /**
  * Submit general contact form

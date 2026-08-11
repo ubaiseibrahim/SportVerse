@@ -1,8 +1,19 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        privacy: resolve(__dirname, 'privacy/index.html'),
+        terms: resolve(__dirname, 'terms/index.html'),
+        tournament: resolve(__dirname, 'tournament/index.html'),
+      },
+    },
+  },
   optimizeDeps: {
     include: [
       'react',
@@ -10,7 +21,6 @@ export default defineConfig({
       'react-dom/client',
       'framer-motion',
       'lucide-react',
-      'react-router-dom',
       'react-countup',
       'react-icons',
       'clsx',

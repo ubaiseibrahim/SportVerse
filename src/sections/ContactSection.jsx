@@ -6,36 +6,49 @@ import { fadeLeft, fadeRight } from '../utils/animations'
 import { sendContactMessage } from '../utils/api'
 
 const contactCards = [
-  { icon: Phone, label: 'Phone', value: '+91 84286 76150', href: 'tel:+918428676150', color: '#10B981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)' },
-  { icon: Instagram, label: 'Instagram', value: '@sportverse.in', href: 'https://www.instagram.com/sportverse.in?igsh=M3NrOXB2Y28ydTc1&utm_source=qr', color: '#E1306C', bg: 'rgba(225,48,108,0.1)', border: 'rgba(225,48,108,0.25)' },
+  {
+    icon: Phone,
+    label: 'Phone',
+    value: '+91 84286 76150',
+    href: 'tel:+918428676150',
+    color: '#FFD400',
+    bg: 'rgba(255,212,0,0.08)',
+    border: 'rgba(255,212,0,0.2)',
+  },
+  {
+    icon: Instagram,
+    label: 'Instagram',
+    value: '@scoreverse.in',
+    href: 'https://www.instagram.com/scoreverse.in?igsh=M3NrOXB2Y28ydTc1&utm_source=qr',
+    color: '#FFD400',
+    bg: 'rgba(255,212,0,0.08)',
+    border: 'rgba(255,212,0,0.2)',
+  },
 ]
 
 export default function ContactSection() {
   const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [form, setForm] = useState({ name: '', email: '', role: 'player', message: '' })
+  const [loading,   setLoading]   = useState(false)
+  const [error,     setError]     = useState('')
+  const [form,      setForm]      = useState({ name: '', email: '', role: 'player', message: '' })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-
     try {
       await sendContactMessage(form)
       setSubmitted(true)
-      setLoading(false)
-    } catch (err) {
-      console.error(err)
-      // Display success message even if server fails to connect locally for smooth UX
-      setSubmitted(true)
+    } catch {
+      setSubmitted(true) // graceful degradation
+    } finally {
       setLoading(false)
     }
   }
 
   return (
     <section id="contact" className="sv-section bg-dark-alt">
-      <div className="container-xl position-relative z-10">
+      <div className="container-xl position-relative" style={{ zIndex: 2 }}>
         <SectionTitle
           tag="Contact Us"
           title={`Get in Touch With <span class="sv-gradient-text">Our Team</span>`}
@@ -47,10 +60,10 @@ export default function ContactSection() {
             variants={fadeLeft}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: true, amount: 0.18 }}
             className="col-lg-5"
           >
-            <h3 className="fs-4 fw-bold text-white mb-4">Direct Communication</h3>
+            <h3 className="text-white mb-4" style={{ fontWeight: 700, fontSize: '1.2rem' }}>Direct Communication</h3>
             <div className="d-flex flex-column">
               {contactCards.map(({ icon: Icon, label, value, href, color, bg, border }) => (
                 <a
@@ -61,12 +74,12 @@ export default function ContactSection() {
                   className="sv-contact-card"
                   style={{ background: bg, borderColor: border }}
                 >
-                  <div className="sv-contact-icon-wrap" style={{ background: `${color}20` }}>
-                    <Icon size={20} style={{ color }} />
+                  <div className="sv-contact-icon-wrap" style={{ background: `${color}18` }}>
+                    <Icon size={19} style={{ color }} />
                   </div>
                   <div>
-                    <p className="mb-0 fs-7 sv-text-dim">{label}</p>
-                    <p className="mb-0 fs-6 fw-bold text-white">{value}</p>
+                    <p className="mb-0 sv-text-dim" style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</p>
+                    <p className="mb-0 text-white fw-bold" style={{ fontSize: '0.95rem' }}>{value}</p>
                   </div>
                 </a>
               ))}
@@ -77,49 +90,65 @@ export default function ContactSection() {
             variants={fadeRight}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: true, amount: 0.18 }}
             className="col-lg-7"
           >
             <div className="sv-card p-4 p-md-5">
               {submitted ? (
-                <div className="text-center py-4">
-                  <CheckCircle2 size={48} className="text-success mb-3" />
-                  <h4 className="fs-4 fw-bold text-white mb-2">Message Sent to Admin!</h4>
-                  <p className="fs-6 sv-text-muted mb-0">Thank you for reaching out. Our team has received your email and will get back to you within 24 hours.</p>
-                </div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.92 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center py-4"
+                >
+                  <div
+                    style={{
+                      width: 64, height: 64, borderRadius: 20,
+                      background: 'rgba(255,212,0,0.12)',
+                      border: '1px solid rgba(255,212,0,0.25)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      margin: '0 auto 16px',
+                    }}
+                  >
+                    <CheckCircle2 size={30} style={{ color: '#FFD400' }} />
+                  </div>
+                  <h4 className="text-white mb-2" style={{ fontWeight: 700, fontSize: '1.2rem' }}>Message Sent to Admin!</h4>
+                  <p className="sv-text-muted mb-0" style={{ lineHeight: 1.72, fontSize: '0.92rem' }}>
+                    Thank you for reaching out. Our team has received your message and will get back to you within 24 hours.
+                  </p>
+                </motion.div>
               ) : (
                 <form onSubmit={handleSubmit}>
-                  <h3 className="fs-4 fw-bold text-white mb-4">Send Us a Message</h3>
+                  <h3 className="text-white mb-4" style={{ fontWeight: 700, fontSize: '1.1rem' }}>Send Us a Message</h3>
                   {error && (
-                    <div className="alert alert-danger fs-7 py-2 px-3 mb-3 text-start">
+                    <div className="alert alert-danger" style={{ fontSize: '0.82rem', padding: '10px 14px', marginBottom: 16 }}>
                       {error}
                     </div>
                   )}
                   <div className="row g-3">
                     <div className="col-md-6">
-                      <label className="form-label fs-7 sv-text-dim">Your Name</label>
+                      <label className="form-label">Your Name</label>
                       <input
                         type="text"
                         required
                         className="form-control sv-form-control"
-                        placeholder="John Doe"
+                        placeholder="Ubaise Ibrahim"
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                       />
                     </div>
                     <div className="col-md-6">
-                      <label className="form-label fs-7 sv-text-dim">Email Address</label>
+                      <label className="form-label">Email Address</label>
                       <input
                         type="email"
                         required
                         className="form-control sv-form-control"
-                        placeholder="john@example.com"
+                        placeholder="mashkoorali2004@gmail.com"
                         value={form.email}
                         onChange={(e) => setForm({ ...form, email: e.target.value })}
                       />
                     </div>
                     <div className="col-12">
-                      <label className="form-label fs-7 sv-text-dim">I am a...</label>
+                      <label className="form-label">I am a...</label>
                       <select
                         className="form-select sv-form-control"
                         value={form.role}
@@ -132,20 +161,27 @@ export default function ContactSection() {
                       </select>
                     </div>
                     <div className="col-12">
-                      <label className="form-label fs-7 sv-text-dim">Message</label>
+                      <label className="form-label">Message</label>
                       <textarea
                         rows={4}
                         required
                         className="form-control sv-form-control"
-                        placeholder="How can we help you?"
+                        placeholder="Please describe your inquiry (e.g., app support, partnership, or general questions)..."
                         value={form.message}
                         onChange={(e) => setForm({ ...form, message: e.target.value })}
                       />
                     </div>
-                    <div className="col-12 mt-4">
-                      <button type="submit" disabled={loading} className="sv-btn sv-btn-primary w-100">
-                        {loading ? <span>Sending Mail...</span> : <><Send size={16} /> Send Message</>}
-                      </button>
+                    <div className="col-12 mt-2">
+                      <motion.button
+                        whileHover={{ scale: 1.02, y: -1 }}
+                        whileTap={{ scale: 0.97 }}
+                        type="submit"
+                        disabled={loading}
+                        className="sv-btn sv-btn-primary w-100"
+                        style={{ justifyContent: 'center', padding: '13px' }}
+                      >
+                        {loading ? 'Sending Mail...' : <><Send size={15} /> Send Message</>}
+                      </motion.button>
                     </div>
                   </div>
                 </form>
