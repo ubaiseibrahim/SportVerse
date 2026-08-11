@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { MapPin, ArrowRight, Download } from 'lucide-react'
-import { API_BASE_URL } from '../utils/api'
+import { MapPin, ArrowRight, Download, Image as ImageIcon } from 'lucide-react'
+import { API_BASE_URL, getImageUrl } from '../utils/api'
 
 export default function TurfRedirect() {
   const pathParts = window.location.pathname.split('/').filter(Boolean)
@@ -58,7 +58,7 @@ export default function TurfRedirect() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center p-4 p-md-5 rounded-4 glass-strong"
+          className="text-center p-0 rounded-4 glass-strong overflow-hidden d-flex flex-column"
           style={{
             background: 'rgba(255, 255, 255, 0.03)',
             border: '1px solid rgba(255, 255, 255, 0.06)',
@@ -66,45 +66,71 @@ export default function TurfRedirect() {
             backdropFilter: 'blur(20px)'
           }}
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
-            className="d-inline-flex align-items-center justify-content-center mb-4"
-            style={{
-              width: 88,
-              height: 88,
-              borderRadius: '28px',
-              background: 'linear-gradient(135deg, rgba(var(--sv-primary-rgb), 0.25), rgba(var(--sv-primary-rgb), 0.05))',
-              border: '1px solid rgba(var(--sv-primary-rgb), 0.4)',
-              boxShadow: '0 8px 32px rgba(var(--sv-primary-rgb), 0.2)',
-            }}
-          >
-            <MapPin size={44} className="sv-text-primary" />
-          </motion.div>
+          {/* Header Image Area */}
+          <div style={{ width: '100%', height: '220px', background: 'rgba(var(--sv-primary-rgb), 0.1)', position: 'relative' }}>
+            {turfData?.coverImage ? (
+              <img 
+                src={getImageUrl(turfData.coverImage)} 
+                alt={turfData?.name || 'Turf'} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+              />
+            ) : (
+              <div className="w-100 h-100 d-flex align-items-center justify-content-center">
+                <MapPin size={44} className="sv-text-primary opacity-50" />
+              </div>
+            )}
+            
+            {/* Gradient overlay to blend with the card below */}
+            <div style={{
+              position: 'absolute',
+              bottom: 0, left: 0, right: 0, height: '80px',
+              background: 'linear-gradient(to top, rgba(15, 15, 20, 1), transparent)'
+            }} />
+          </div>
 
-          {loading ? (
-            <p className="text-white">Loading turf details...</p>
-          ) : error || !turfData ? (
-            <>
-              <h1 className="fw-bold text-white mb-3" style={{ fontSize: '1.75rem', lineHeight: '1.3' }}>
-                View Turf on <span className="sv-text-primary">ScoreVerse</span>
-              </h1>
-              <p className="sv-text-muted fs-6 mb-4 px-md-3" style={{ lineHeight: '1.6' }}>
-                Book turfs, manage your team, and play matches seamlessly with our mobile app.
-              </p>
-            </>
-          ) : (
-            <>
-              <h1 className="fw-bold text-white mb-3" style={{ fontSize: '1.75rem', lineHeight: '1.3' }}>
-                {turfData.name}
-              </h1>
-              <p className="sv-text-muted fs-6 mb-4 px-md-3" style={{ lineHeight: '1.6' }}>
-                {turfData.location?.city || 'Location unavailable'}<br/>
-                Download ScoreVerse to view amenities, available slots, and book instantly!
-              </p>
-            </>
-          )}
+          <div className="p-4 p-md-5 d-flex flex-column align-items-center" style={{ marginTop: '-40px', position: 'relative', zIndex: 2 }}>
+            {loading ? (
+              <p className="text-white mt-4">Loading turf details...</p>
+            ) : error || !turfData ? (
+              <>
+                <h1 className="fw-bold text-white mb-3 mt-2" style={{ fontSize: '1.75rem', lineHeight: '1.3' }}>
+                  View Turf on <span className="sv-text-primary">ScoreVerse</span>
+                </h1>
+                <p className="sv-text-muted fs-6 mb-4 px-md-3" style={{ lineHeight: '1.6' }}>
+                  Book turfs, manage your team, and play matches seamlessly with our mobile app.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="fw-bold text-white mb-3 mt-2" style={{ fontSize: '1.75rem', lineHeight: '1.3' }}>
+                  {turfData.name}
+                </h1>
+                <p className="sv-text-muted fs-6 mb-2 px-md-3" style={{ lineHeight: '1.6' }}>
+                  <MapPin size={16} className="sv-text-primary d-inline me-1" style={{ verticalAlign: 'text-bottom' }} />
+                  {turfData.googleMapsUrl ? (
+                    <a href={turfData.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="text-light text-decoration-underline" style={{ transition: 'color 0.2s' }}>
+                      {turfData.city ? `${turfData.city} (Map)` : 'View on Map'}
+                    </a>
+                  ) : (
+                    <>{turfData.city || 'Location unavailable'}</>
+                  )}
+                </p>
+                
+                {turfData.amenities && (
+                  <div className="d-flex flex-wrap gap-2 justify-content-center mb-4 px-3">
+                    {Object.entries(turfData.amenities).filter(([_, val]) => val).map(([key]) => (
+                      <span key={key} className="badge bg-dark border border-secondary text-light px-2 py-1 rounded-pill" style={{ fontSize: '10px', textTransform: 'uppercase' }}>
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <p className="sv-text-muted fs-6 mb-4 px-md-3" style={{ lineHeight: '1.6' }}>
+                  Download ScoreVerse to view available slots and book instantly!
+                </p>
+              </>
+            )}
 
           <motion.a
             whileHover={{ scale: 1.03 }}
@@ -119,10 +145,11 @@ export default function TurfRedirect() {
             Download from Play Store
           </motion.a>
 
-          <div className="d-flex align-items-center justify-content-center gap-2 mt-2">
-            <a href="/" className="sv-text-dim text-decoration-none hover-white fs-7 d-flex align-items-center gap-1">
-              Visit Homepage <ArrowRight size={14} />
-            </a>
+            <div className="d-flex align-items-center justify-content-center gap-2 mt-2">
+              <a href="/" className="sv-text-dim text-decoration-none hover-white fs-7 d-flex align-items-center gap-1">
+                Visit Homepage <ArrowRight size={14} />
+              </a>
+            </div>
           </div>
 
         </motion.div>
