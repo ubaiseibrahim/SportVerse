@@ -105,16 +105,19 @@ export default function TurfRedirect() {
                 <h1 className="fw-bold text-white mb-3 mt-2" style={{ fontSize: '1.75rem', lineHeight: '1.3' }}>
                   {turfData.name}
                 </h1>
-                <p className="sv-text-muted fs-6 mb-2 px-md-3" style={{ lineHeight: '1.6' }}>
-                  <MapPin size={16} className="sv-text-primary d-inline me-1" style={{ verticalAlign: 'text-bottom' }} />
+                <div className="d-flex flex-column align-items-center mb-3 px-md-3">
                   {turfData.googleMapsUrl ? (
-                    <a href={turfData.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="text-light text-decoration-underline" style={{ transition: 'color 0.2s' }}>
-                      {turfData.city ? `${turfData.city} (Map)` : 'View on Map'}
+                    <a href={turfData.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="btn btn-sm border border-secondary text-light rounded-pill px-3 py-1 text-decoration-none d-inline-flex align-items-center gap-1" style={{ transition: 'all 0.2s', fontSize: '0.85rem', backgroundColor: 'rgba(255,255,255,0.05)' }}>
+                      <MapPin size={14} className="sv-text-primary" />
+                      {turfData.city ? `Find in ${turfData.city}` : 'Find on Map'}
                     </a>
                   ) : (
-                    <>{turfData.city || 'Location unavailable'}</>
+                    <p className="sv-text-muted fs-6 mb-0" style={{ lineHeight: '1.6' }}>
+                      <MapPin size={16} className="sv-text-primary d-inline me-1" style={{ verticalAlign: 'text-bottom' }} />
+                      {turfData.city || 'Location unavailable'}
+                    </p>
                   )}
-                </p>
+                </div>
                 
                 {turfData.amenities && (
                   <div className="d-flex flex-wrap gap-2 justify-content-center mb-4 px-3">
