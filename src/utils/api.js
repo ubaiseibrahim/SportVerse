@@ -1,4 +1,4 @@
-// export const API_BASE_URL = 'http://localhost:5001/api';
+// export const API_BASE_URL = 'http://localhost:5002/api';
 export const API_BASE_URL = 'https://api.scoreverse.in/api';
 const HOST_URL = 'https://api.scoreverse.in';
 

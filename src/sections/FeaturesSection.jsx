@@ -11,7 +11,7 @@ import {
 const features = [
   { icon: CalendarCheck,   title: 'Instant Turf Booking',      description: 'Book your favorite sports turf in seconds. No calls, no queues.',              color: '#FFD400', size: 'large' },
   { icon: Activity,        title: 'Live Match Scoring',         description: 'Follow every ball, goal, and point in real time with live updates.',             color: '#FFD400', size: 'medium' },
-  { icon: Trophy,          title: 'Tournament Management',      description: 'Create and broadcast tournaments with automated scheduling.',                    color: '#FFD400', size: 'medium' },
+  { icon: Trophy,          title: 'Tournament Management',      description: 'Create and manage tournaments with automated scheduling.',                    color: '#FFD400', size: 'medium' },
   { icon: Wifi,            title: 'Real-Time Availability',     description: 'See live slot availability and pick the perfect time for your game.',           color: '#FFD400', size: 'small' },
   { icon: CreditCard,      title: 'Secure Payments',            description: 'Pay safely via UPI, cards, or net banking.',                                    color: '#E6BF00', size: 'small' },
   { icon: Gavel,           title: 'Player Auction System',      description: 'Run live IPL-style player auctions with budgets, bids, and results.',            color: '#FFD400', size: 'medium' },

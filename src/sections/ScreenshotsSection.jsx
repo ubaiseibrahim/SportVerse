@@ -12,7 +12,7 @@ const screens = [
     content: (
       <div className="position-relative w-100 h-100 overflow-hidden bg-black d-flex align-items-center justify-content-center" style={{ minHeight: 460 }}>
         <video
-          src="/SportVerse.mp4"
+          src="/Launch_Screen.mp4"
           autoPlay
           controls
           loop
@@ -44,7 +44,7 @@ const screens = [
           <span className="badge bg-warning text-dark fw-bold mb-2">Mobile Video Ad</span>
           <h4 className="fs-6 fw-bold text-white mb-1">ScoreVerse Video Ad</h4>
           <p className="fs-7 sv-text-muted mb-0" style={{ fontSize: 11 }}>
-            Playing <code>SportVerse.mp4</code> live
+            Playing <code>Launch_Screen.mp4</code> live
           </p>
         </div>
       </div>
