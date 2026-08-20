@@ -39,6 +39,10 @@
   --sv-teal:         #FFD400;
   --sv-pink:         #FFD400;
 
+  /* Primary alias (used by deep-link/redirect pages) */
+  --sv-primary:      #FFD400;
+  --sv-primary-rgb:  255, 212, 0;
+
   /* Radius */
   --r-sm:   10px;
   --r-md:   16px;
@@ -298,8 +302,9 @@ button { font-family: var(--font-body); }
   letter-spacing: -0.025em;
   font-family: var(--font-display);
 }
-.sv-text-muted { color: var(--sv-text-muted) !important; }
-.sv-text-dim   { color: var(--sv-text-dim) !important; }
+.sv-text-muted   { color: var(--sv-text-muted) !important; }
+.sv-text-dim     { color: var(--sv-text-dim) !important; }
+.sv-text-primary { color: var(--sv-primary) !important; }
 
 /* ─────────────────────────────────────────────────────────────
    GRADIENTS
@@ -482,16 +487,15 @@ button { font-family: var(--font-body); }
    NAVBAR
 ───────────────────────────────────────────────────────────── */
 .sv-navbar {
-  background: transparent;
+  background: #000000;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
   transition: background 0.45s ease, box-shadow 0.45s ease, padding 0.4s ease;
   padding: 16px 0;
   position: relative;
 }
 .sv-navbar.scrolled {
-  background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(32px) saturate(180%);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: #000000;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
   box-shadow: 0 4px 40px rgba(0,0,0,0.6);
   padding: 10px 0;
 }
@@ -1300,4 +1304,158 @@ button { font-family: var(--font-body); }
   .sv-hero { padding: 90px 0 48px; }
   .sv-hero-badge { font-size: 11px; padding: 5px 12px; }
   .sv-bento-grid { gap: 10px; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CINEMATIC STADIUM LIGHT SWEEP
+   Used sparingly for hero + section-divider continuity motif.
+───────────────────────────────────────────────────────────── */
+.sv-light-sweep {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.sv-light-sweep::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: -20%;
+  width: 55%;
+  height: 180%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255,212,0,0.05) 45%, rgba(255,212,0,0.1) 50%, rgba(255,212,0,0.05) 55%, transparent 100%);
+  transform: rotate(8deg);
+  animation: sv-sweep-move 9s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes sv-sweep-move {
+  0%, 100% { transform: translateX(-10%) rotate(8deg); opacity: 0.6; }
+  50%      { transform: translateX(140%) rotate(8deg); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sv-light-sweep::before { animation: none; opacity: 0.3; transform: translateX(60%) rotate(8deg); }
+}
+
+/* Turf-line section divider — shared visual motif between sections */
+.sv-turf-divider {
+  position: relative;
+  height: 1px;
+  margin: 0 auto;
+  max-width: 1200px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,212,0,0.35) 50%, transparent 100%);
+}
+.sv-turf-divider::before,
+.sv-turf-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--sv-gold);
+  box-shadow: 0 0 10px rgba(255,212,0,0.8);
+  transform: translateY(-50%);
+}
+.sv-turf-divider::before { left: 30%; }
+.sv-turf-divider::after  { right: 30%; }
+
+/* ─────────────────────────────────────────────────────────────
+   BROADCAST SCOREBOARD
+───────────────────────────────────────────────────────────── */
+.sv-scorebar {
+  background: linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.015) 100%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--r-xl);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+  position: relative;
+}
+.sv-scorebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,212,0,0.04);
+}
+.sv-scorebar-body { padding: 22px; }
+.sv-score-team-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+.sv-score-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.sv-ball-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; height: 30px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 800;
+  font-family: var(--font-display);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7);
+  flex-shrink: 0;
+}
+.sv-ball-chip.boundary {
+  background: rgba(255,212,0,0.16);
+  border-color: rgba(255,212,0,0.4);
+  color: var(--sv-gold);
+}
+.sv-ball-chip.six {
+  background: var(--sv-gold);
+  border-color: var(--sv-gold);
+  color: #000;
+  box-shadow: 0 0 16px rgba(255,212,0,0.5);
+}
+.sv-ball-chip.wicket {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.35);
+  color: #fff;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CINEMATIC CURSOR (desktop / fine-pointer only)
+───────────────────────────────────────────────────────────── */
+.sv-cursor-dot,
+.sv-cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 10000;
+  border-radius: 50%;
+  will-change: transform;
+}
+.sv-cursor-dot {
+  width: 6px; height: 6px;
+  background: var(--sv-gold);
+  transform: translate(-50%, -50%);
+}
+.sv-cursor-ring {
+  width: 32px; height: 32px;
+  border: 1px solid rgba(255,212,0,0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.25s var(--ease-out), height 0.25s var(--ease-out), border-color 0.25s;
+}
+.sv-cursor-ring.is-active {
+  width: 46px; height: 46px;
+  border-color: rgba(255,212,0,0.85);
+  background: rgba(255,212,0,0.06);
+}
+html.sv-cursor-on,
+html.sv-cursor-on a,
+html.sv-cursor-on button,
+html.sv-cursor-on [role="button"] {
+  cursor: none;
 }

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { MapPin, Trophy, Activity, Users, BarChart3, Bell } from 'lucide-react'
 import AnimatedBlobs from '../components/AnimatedBlobs'
 import { fadeLeft, fadeRight, fadeUp, containerVariants } from '../utils/animations'
+import { scrollToSection } from '../utils/scroll'
 
 const features = [
   { icon: MapPin,    text: 'Book nearby turfs instantly',      color: '#FFD400' },
@@ -87,13 +88,13 @@ export default function AboutSection() {
               className="d-flex flex-wrap gap-3"
             >
               <button
-                onClick={() => document.querySelector('#features')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => scrollToSection('#features')}
                 className="sv-btn sv-btn-primary"
               >
                 Explore Features
               </button>
               <button
-                onClick={() => document.querySelector('#download')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => scrollToSection('#download')}
                 className="sv-btn sv-btn-outline"
               >
                 Download App

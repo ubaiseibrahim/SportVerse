@@ -5,7 +5,9 @@ import {
   Activity, Users, Award, Zap, Target,
 } from 'lucide-react'
 import AnimatedBlobs from '../components/AnimatedBlobs'
+import MagneticButton from '../components/MagneticButton'
 import { fadeUp, containerVariants } from '../utils/animations'
+import { scrollToSection } from '../utils/scroll'
 
 /* ── Floating card ────────────────────────────────────────── */
 function FloatingCard({ children, style = {}, delay = 0, floatClass = 'sv-float' }) {
@@ -50,8 +52,26 @@ function StatItem({ value, label }) {
 }
 
 export default function HeroSection({ onDownloadClick }) {
-  const handleScroll = (id) =>
-    document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' })
+  const handleScroll = (id) => scrollToSection(id)
+
+  const fieldRef = useRef(null)
+  const tiltX = useMotionValue(0)
+  const tiltY = useMotionValue(0)
+  const springTiltX = useSpring(tiltX, { stiffness: 120, damping: 20 })
+  const springTiltY = useSpring(tiltY, { stiffness: 120, damping: 20 })
+
+  const handleFieldMove = (e) => {
+    if (!window.matchMedia('(pointer: fine)').matches || !fieldRef.current) return
+    const rect = fieldRef.current.getBoundingClientRect()
+    const px = (e.clientX - rect.left) / rect.width - 0.5
+    const py = (e.clientY - rect.top) / rect.height - 0.5
+    tiltY.set(px * 10)
+    tiltX.set(py * -10)
+  }
+  const handleFieldLeave = () => {
+    tiltX.set(0)
+    tiltY.set(0)
+  }
 
   const sports = [
     { icon: Trophy,   label: 'Cricket',    color: 'rgba(255,212,0,0.3)',   delay: 0.6 },
@@ -75,6 +95,7 @@ export default function HeroSection({ onDownloadClick }) {
       <div className="sv-hero-spotlight" aria-hidden="true" />
       <div className="sv-grid-overlay" aria-hidden="true" />
       <div className="sv-noise" aria-hidden="true" />
+      <div className="sv-light-sweep" aria-hidden="true" />
       <AnimatedBlobs variant="default" />
 
       <div className="container-xl position-relative" style={{ zIndex: 10, width: '100%' }}>
@@ -146,7 +167,7 @@ export default function HeroSection({ onDownloadClick }) {
               transition={{ delay: 0.45, duration: 0.55 }}
               className="d-flex flex-wrap gap-3 mb-4"
             >
-              <motion.button
+              <MagneticButton
                 whileHover={{ scale: 1.04, y: -2 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={onDownloadClick}
@@ -154,17 +175,17 @@ export default function HeroSection({ onDownloadClick }) {
                 style={{ fontSize: 15, padding: '14px 30px' }}
               >
                 <Smartphone size={17} />
-                Download App
-              </motion.button>
-              <motion.button
+                Book a Turf
+              </MagneticButton>
+              <MagneticButton
                 whileHover={{ scale: 1.03, y: -1 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => handleScroll('#features')}
+                onClick={() => handleScroll('#live-scoring')}
                 className="sv-btn sv-btn-outline"
                 style={{ fontSize: 15, padding: '14px 28px' }}
               >
-                Explore Features →
-              </motion.button>
+                Explore Scoring →
+              </MagneticButton>
             </motion.div>
 
             {/* Sport orbs */}
@@ -200,8 +221,11 @@ export default function HeroSection({ onDownloadClick }) {
 
           {/* ── Desktop: floating field showcase ─────────── */}
           <div
+            ref={fieldRef}
+            onMouseMove={handleFieldMove}
+            onMouseLeave={handleFieldLeave}
             className="col-lg-6 d-none d-lg-flex justify-content-center position-relative"
-            style={{ minHeight: 500 }}
+            style={{ minHeight: 500, perspective: 1200 }}
           >
             {/* Central field illustration */}
             <motion.div
@@ -215,6 +239,9 @@ export default function HeroSection({ onDownloadClick }) {
                 border: '1px solid rgba(255,255,255,0.08)',
                 borderRadius: 28,
                 boxShadow: '0 32px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07)',
+                rotateX: springTiltX,
+                rotateY: springTiltY,
+                transformStyle: 'preserve-3d',
               }}
             >
               {/* Cricket pitch geometry */}

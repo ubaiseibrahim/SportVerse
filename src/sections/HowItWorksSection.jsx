@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Search, CalendarClock, ShieldCheck, PartyPopper, ArrowRight } from 'lucide-react'
 import SectionTitle from '../components/SectionTitle'
 import { fadeUp } from '../utils/animations'
+import { scrollToSection } from '../utils/scroll'
 
 const steps = [
   {
@@ -110,7 +111,7 @@ export default function HowItWorksSection() {
           className="text-center mt-4"
         >
           <button
-            onClick={() => document.querySelector('#download')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => scrollToSection('#download')}
             className="sv-btn sv-btn-primary"
             style={{ fontSize: 15, padding: '14px 32px' }}
           >

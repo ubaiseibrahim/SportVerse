@@ -32,9 +32,11 @@ export default function DownloadSection({ onDownloadClick }) {
 
               <div className="d-flex flex-wrap gap-3 mb-4">
                 {/* Google Play */}
-                <button
-                  onClick={onDownloadClick}
-                  className="sv-store-btn border-0"
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.scoreverse.sports"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="sv-store-btn border-0 text-decoration-none"
                   aria-label="Download on Google Play"
                 >
                   <svg viewBox="0 0 24 24" style={{ width: 26, height: 26, flexShrink: 0 }} fill="none">
@@ -51,7 +53,7 @@ export default function DownloadSection({ onDownloadClick }) {
                     <p className="mb-0 sv-text-dim" style={{ fontSize: '10px', lineHeight: 1 }}>Get it on</p>
                     <p className="mb-0 text-white fw-bold" style={{ fontSize: '0.95rem' }}>Google Play</p>
                   </div>
-                </button>
+                </a>
 
                 {/* App Store */}
                 <button

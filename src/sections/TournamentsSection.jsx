@@ -6,6 +6,7 @@ import {
 import SectionTitle from '../components/SectionTitle'
 import AnimatedBlobs from '../components/AnimatedBlobs'
 import { fadeUp, fadeLeft, fadeRight, containerVariants } from '../utils/animations'
+import { scrollToSection } from '../utils/scroll'
 
 const formats = [
   { icon: Trophy,     label: 'League',        description: 'Round-robin style where every team plays each other.', color: '#FFD400', popular: true },
@@ -181,7 +182,7 @@ export default function TournamentsSection() {
             </div>
 
             <button
-              onClick={() => document.querySelector('#download')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => scrollToSection('#download')}
               className="sv-btn sv-btn-primary"
             >
               Create Tournament Now

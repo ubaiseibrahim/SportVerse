@@ -1,4 +1,5 @@
 import { Smartphone, Phone, Instagram } from 'lucide-react'
+import { scrollToSection } from '../utils/scroll'
 
 export default function Footer({ onDownloadClick }) {
   const handleNav = (href) => {
@@ -6,7 +7,7 @@ export default function Footer({ onDownloadClick }) {
     if (pathname !== '/' && pathname !== '/index.html') {
       window.location.href = '/' + href
     } else {
-      document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
+      scrollToSection(href)
     }
   }
 
@@ -78,6 +79,7 @@ export default function Footer({ onDownloadClick }) {
             <a href="#home"         onClick={(e) => { e.preventDefault(); handleNav('#home')         }} className="sv-footer-link">Home</a>
             <a href="#features"     onClick={(e) => { e.preventDefault(); handleNav('#features')     }} className="sv-footer-link">Features</a>
             <a href="#how-it-works" onClick={(e) => { e.preventDefault(); handleNav('#how-it-works') }} className="sv-footer-link">How It Works</a>
+            <a href="#live-scoring" onClick={(e) => { e.preventDefault(); handleNav('#live-scoring') }} className="sv-footer-link">Live Scoring</a>
             <a href="#tournaments"  onClick={(e) => { e.preventDefault(); handleNav('#tournaments')  }} className="sv-footer-link">Tournaments</a>
           </div>
 
@@ -125,7 +127,7 @@ export default function Footer({ onDownloadClick }) {
         <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3" style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>
           <p className="mb-0">© {new Date().getFullYear()} ScoreVerse Technologies Pvt. Ltd. All rights reserved.</p>
           <div className="d-flex gap-4">
-            <a href="/privacy" className="sv-footer-link mb-0" style={{ fontSize: '0.8rem' }}>Privacy Policy</a>
+            <a href="/privacy-policy" className="sv-footer-link mb-0" style={{ fontSize: '0.8rem' }}>Privacy Policy</a>
             <a href="/terms" className="sv-footer-link mb-0" style={{ fontSize: '0.8rem' }}>Terms of Service</a>
           </div>
         </div>

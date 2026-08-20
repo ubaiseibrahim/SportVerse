@@ -6,6 +6,7 @@ import {
 import SectionTitle from '../components/SectionTitle'
 import AnimatedBlobs from '../components/AnimatedBlobs'
 import { fadeLeft, fadeRight, fadeUp, containerVariants } from '../utils/animations'
+import { scrollToSection } from '../utils/scroll'
 
 const ownerFeatures = [
   { icon: CalendarCheck, title: 'Manage Bookings',   desc: 'Accept or reschedule bookings with one tap.',                color: '#FFD400' },
@@ -153,7 +154,7 @@ export default function OwnersSection() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => scrollToSection('#contact')}
               className="sv-btn sv-btn-green"
             >
               <Building2 size={16} />

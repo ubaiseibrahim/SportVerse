@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Smartphone } from 'lucide-react'
+import { scrollToSection } from '../utils/scroll'
 
 const navLinks = [
   { label: 'Home',        href: '#home' },
   { label: 'Features',    href: '#features' },
+  { label: 'Live Scores', href: '#live-scoring' },
   { label: 'Tournaments', href: '#tournaments' },
   { label: 'Owners',      href: '#owners' },
   { label: 'FAQ',         href: '#faq' },
@@ -38,7 +40,7 @@ export default function Navbar({ onDownloadClick }) {
     if (pathname !== '/' && pathname !== '/index.html') {
       window.location.href = '/' + href
     } else {
-      document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
+      scrollToSection(href)
     }
   }
 
@@ -132,14 +134,15 @@ export default function Navbar({ onDownloadClick }) {
             animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
             exit={{ opacity: 0, y: -12, scale: 0.97, filter: 'blur(8px)' }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="glass-strong"
             style={{
               position: 'absolute',
               top: 'calc(100% + 8px)',
               left: 16, right: 16,
               borderRadius: 20,
               padding: '12px 8px',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06)',
+              background: '#000000',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.8)',
             }}
             role="navigation"
             aria-label="Mobile navigation"

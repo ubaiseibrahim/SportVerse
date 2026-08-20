@@ -1,11 +1,12 @@
 import { Suspense, lazy } from 'react'
 import HeroSection from '../sections/HeroSection'
+import SectionDivider from '../components/SectionDivider'
 
 // Lazy-load heavier sections for faster initial load
-const ScreenshotsSection = lazy(() => import('../sections/ScreenshotsSection'))
 const AboutSection       = lazy(() => import('../sections/AboutSection'))
 const FeaturesSection    = lazy(() => import('../sections/FeaturesSection'))
 const HowItWorksSection  = lazy(() => import('../sections/HowItWorksSection'))
+const LiveScoringSection = lazy(() => import('../sections/LiveScoringSection'))
 const TournamentsSection = lazy(() => import('../sections/TournamentsSection'))
 const AuctionSection     = lazy(() => import('../sections/AuctionSection'))
 const OwnersSection      = lazy(() => import('../sections/OwnersSection'))
@@ -27,11 +28,11 @@ export default function HomePage({ onDownloadClick }) {
       <HeroSection onDownloadClick={onDownloadClick} />
 
       <Suspense fallback={<div className="h-32" />}>
-        {/* Mobile Screen Showcase & Video Ad Section AT FIRST */}
-        <ScreenshotsSection />
         <AboutSection />
         <FeaturesSection />
         <HowItWorksSection />
+        <SectionDivider />
+        <LiveScoringSection />
         <TournamentsSection />
         <AuctionSection />
         <OwnersSection />
@@ -39,6 +40,7 @@ export default function HomePage({ onDownloadClick }) {
         <TestimonialsSection />
         <FAQSection />
         {/* <PrivacyPolicy /> */}
+        <SectionDivider />
         <DownloadSection onDownloadClick={onDownloadClick} />
         <ContactSection />
       </Suspense>

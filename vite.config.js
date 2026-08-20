@@ -3,7 +3,23 @@ import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'html-rewrite-middleware',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+          if (url.pathname === '/privacy-policy' || url.pathname === '/privacy-policy/') {
+            req.url = '/privacy/index.html';
+          } else if (url.pathname === '/terms' || url.pathname === '/terms/') {
+            req.url = '/terms/index.html';
+          }
+          next();
+        });
+      }
+    }
+  ],
   build: {
     rollupOptions: {
       input: {
