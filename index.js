@@ -27,7 +27,21 @@ export default {
       // We must manually serve /index.html for unrecognized routes (like / or /profile).
       if (response.status === 404 || response.status === 403) {
         const indexUrl = new URL(request.url);
-        indexUrl.pathname = '/index.html';
+        if (url.pathname.startsWith('/turf/')) {
+          indexUrl.pathname = '/turf/index.html';
+        } else if (url.pathname.startsWith('/match/')) {
+          indexUrl.pathname = '/match/index.html';
+        } else if (url.pathname.startsWith('/tournament/')) {
+          indexUrl.pathname = '/tournament/index.html';
+        } else if (url.pathname.startsWith('/player/')) {
+          indexUrl.pathname = '/player/index.html';
+        } else if (url.pathname === '/privacy-policy' || url.pathname === '/privacy-policy/') {
+          indexUrl.pathname = '/privacy/index.html';
+        } else if (url.pathname === '/terms' || url.pathname === '/terms/') {
+          indexUrl.pathname = '/terms/index.html';
+        } else {
+          indexUrl.pathname = '/index.html';
+        }
         response = await env.ASSETS.fetch(new Request(indexUrl.toString(), request));
       }
 

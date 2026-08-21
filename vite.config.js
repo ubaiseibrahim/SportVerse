@@ -29,6 +29,7 @@ export default defineConfig({
         tournament: resolve(__dirname, 'tournament/index.html'),
         match: resolve(__dirname, 'match/index.html'),
         turf: resolve(__dirname, 'turf/index.html'),
+        player: resolve(__dirname, 'player/index.html'),
       },
     },
   },
