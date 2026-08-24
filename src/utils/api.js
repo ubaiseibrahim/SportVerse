@@ -1,5 +1,5 @@
-export const API_BASE_URL = import.meta.env.DEV ? 'http://localhost:5002/api' : 'https://api.scoreverse.in/api';
-const HOST_URL = import.meta.env.DEV ? 'http://localhost:5002' : 'https://api.scoreverse.in';
+export const API_BASE_URL = 'https://api.scoreverse.in/api';
+const HOST_URL = 'https://api.scoreverse.in';
 
 export const getImageUrl = (path) => {
   if (!path || typeof path !== 'string') return null;

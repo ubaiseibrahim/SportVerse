@@ -170,7 +170,7 @@ export default function HeroSection({ onDownloadClick }) {
               <MagneticButton
                 whileHover={{ scale: 1.04, y: -2 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={onDownloadClick}
+                onClick={() => handleScroll('#book-turf')}
                 className="sv-btn sv-btn-primary"
                 style={{ fontSize: 15, padding: '14px 30px' }}
               >
@@ -180,11 +180,28 @@ export default function HeroSection({ onDownloadClick }) {
               <MagneticButton
                 whileHover={{ scale: 1.03, y: -1 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => handleScroll('#live-scoring')}
+                onClick={() => {
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(async (position) => {
+                      try {
+                        const { latitude, longitude } = position.coords;
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+                        const data = await res.json();
+                        const city = data.address?.city || data.address?.state_district || data.address?.town || 'mumbai';
+                        window.location.href = `/sports-turfs-in-${city.toLowerCase().replace(/\\s+/g, '-')}`;
+                      } catch (err) {
+                        window.location.href = '/search';
+                      }
+                    }, () => window.location.href = '/search');
+                  } else {
+                    window.location.href = '/search';
+                  }
+                }}
                 className="sv-btn sv-btn-outline"
-                style={{ fontSize: 15, padding: '14px 28px' }}
+                style={{ fontSize: 15, padding: '14px 28px', backgroundColor: 'rgba(255,212,0,0.1)', color: '#FFD400', borderColor: '#FFD400' }}
               >
-                Explore Scoring →
+                <MapPin size={17} />
+                Find Near Me
               </MagneticButton>
             </motion.div>
 

@@ -18,6 +18,10 @@ export default defineConfig({
             req.url = '/terms/index.html';
           } else if (path.startsWith('/search') && !path.includes('.')) {
             req.url = '/search/index.html';
+          } else if (path.includes('-in-') && !path.includes('.') && path.split('/').length === 2) {
+            req.url = '/search/index.html';
+          } else if (path.startsWith('/blog') && !path.includes('.')) {
+            req.url = '/blog/index.html';
           } else if (path.startsWith('/dashboard') && !path.includes('.')) {
             req.url = '/dashboard/index.html';
           } else if (path.startsWith('/turf/') && !path.includes('.')) {
@@ -46,6 +50,7 @@ export default defineConfig({
         player: resolve(__dirname, 'player/index.html'),
         search: resolve(__dirname, 'search/index.html'),
         dashboard: resolve(__dirname, 'dashboard/index.html'),
+        blog: resolve(__dirname, 'blog/index.html'),
       },
     },
   },

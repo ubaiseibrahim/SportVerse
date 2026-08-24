@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, MapPin, Sparkles, Navigation, X, DollarSign, Calendar, Info } from 'lucide-react'
 import { API_BASE_URL, getImageUrl } from '../utils/api'
+import { Helmet } from 'react-helmet-async'
 
 const searchStyles = `
   .sv-search-input::placeholder {
@@ -23,13 +24,35 @@ export default function SearchPage() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [cityError, setCityError] = useState(false)
+  const [dynamicCityTitle, setDynamicCityTitle] = useState('')
+  const [dynamicFeatureTitle, setDynamicFeatureTitle] = useState('Sports Turfs')
+  const [dynamicLandmarkTitle, setDynamicLandmarkTitle] = useState('')
   
   const suggestionsRef = useRef(null)
 
-  // Client-side filtering by name
+  // Client-side filtering by name, type, or amenities
   const filteredTurfs = turfs.filter((turf) => {
     if (!keyword.trim()) return true
-    return turf.name.toLowerCase().includes(keyword.trim().toLowerCase())
+    const searchString = keyword.trim().toLowerCase()
+    const searchWords = searchString.split(/\s+/)
+    
+    // Exact match check
+    const matchExactName = turf.name?.toLowerCase().includes(searchString)
+    
+    // Word match check (e.g. "Indoor Cricket" checks if "Indoor" or "Cricket" exist)
+    const matchAnyWord = searchWords.some(word => {
+      if (!word) return false;
+      const matchName = turf.name?.toLowerCase().includes(word)
+      const matchType = turf.type?.toLowerCase().includes(word)
+      
+      const matchAmenities = turf.amenities && Object.entries(turf.amenities).some(([key, value]) => {
+        return value && key.toLowerCase().includes(word)
+      })
+      
+      return matchName || matchType || matchAmenities
+    })
+
+    return matchExactName || matchAnyWord
   })
 
   // Close city suggestions when clicking outside
@@ -70,9 +93,81 @@ export default function SearchPage() {
     return () => clearTimeout(delayDebounce)
   }, [cityInput])
 
+  // Parse URL for programmatic SEO cities and features on mount
+  useEffect(() => {
+    const path = window.location.pathname
+    let cityFromUrl = null
+    let featureFromUrl = 'Sports Turfs'
+    let landmarkFromUrl = null
+    
+    // Match anything like /indoor-football-turfs-in-andheri-mumbai
+    const match = path.match(/^\/([a-zA-Z0-9-]+)-in-([a-zA-Z0-9-]+)$/)
+    if (match) {
+      const featureRaw = match[1]
+      const locationRaw = match[2]
+
+      // Extract Landmark and City (e.g. andheri-mumbai -> Andheri, Mumbai)
+      if (locationRaw.includes('-')) {
+        const parts = locationRaw.split('-')
+        cityFromUrl = parts.pop()
+        landmarkFromUrl = parts.join(' ')
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+      } else {
+        cityFromUrl = locationRaw
+      }
+
+      featureFromUrl = featureRaw
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+    } else if (path.startsWith('/turfs-in-')) {
+      cityFromUrl = path.replace('/turfs-in-', '').split('/')[0]
+      if (cityFromUrl.includes('-')) {
+        const parts = cityFromUrl.split('-')
+        cityFromUrl = parts.pop()
+        landmarkFromUrl = parts.join(' ')
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+      }
+    }
+
+    if (cityFromUrl) {
+      const formattedCity = cityFromUrl
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+      
+      setDynamicCityTitle(formattedCity)
+      setDynamicFeatureTitle(featureFromUrl)
+      if (landmarkFromUrl) setDynamicLandmarkTitle(landmarkFromUrl)
+      setCityInput(formattedCity)
+      
+      // Auto-filter by the feature or landmark
+      let autoKeyword = ''
+      if (featureFromUrl !== 'Sports Turfs' && featureFromUrl.toLowerCase() !== 'turfs') {
+        autoKeyword = featureFromUrl.replace(/(Turfs|Grounds|Pitches)/i, '').trim()
+      }
+      if (landmarkFromUrl) {
+        autoKeyword = autoKeyword ? `${autoKeyword} ${landmarkFromUrl}` : landmarkFromUrl
+      }
+      
+      if (autoKeyword) {
+        setKeyword(autoKeyword)
+      }
+
+      // Trigger search with the city from URL
+      handleSearch(1, formattedCity)
+    }
+  }, [])
+
   // Perform search query to retrieve turfs
-  const handleSearch = async (targetPage = 1) => {
-    if (!cityInput.trim() && !selectedCity) {
+  const handleSearch = async (targetPage = 1, overrideCity = null) => {
+    const cityToSearch = overrideCity || cityInput.trim()
+    
+    if (!cityToSearch && !selectedCity) {
       setCityError(true)
       return
     }
@@ -87,14 +182,14 @@ export default function SearchPage() {
         limit: '15' // Fetch larger results to allow fluent client-side filtering
       })
 
-      if (selectedCity) {
+      if (selectedCity && !overrideCity) {
         queryParams.append('city', selectedCity.name)
         if (selectedCity.latitude && selectedCity.longitude) {
           queryParams.append('lat', selectedCity.latitude)
           queryParams.append('lng', selectedCity.longitude)
         }
-      } else if (cityInput.trim()) {
-        queryParams.append('city', cityInput.trim())
+      } else if (cityToSearch) {
+        queryParams.append('city', cityToSearch)
       }
 
       const url = `${API_BASE_URL}/turfs?${queryParams.toString()}`
@@ -132,6 +227,37 @@ export default function SearchPage() {
       className="position-relative overflow-hidden w-100"
       style={{ minHeight: '95vh', backgroundColor: 'var(--sv-bg)', paddingTop: '110px', paddingBottom: '90px' }}
     >
+      <Helmet>
+        <title>{dynamicCityTitle ? `Best ${dynamicFeatureTitle} in ${dynamicLandmarkTitle ? dynamicLandmarkTitle + ', ' : ''}${dynamicCityTitle} - Book Online | ScoreVerse` : 'Search Turfs | ScoreVerse'}</title>
+        <meta name="description" content={dynamicCityTitle ? `Find and book the best ${dynamicFeatureTitle.toLowerCase()} in ${dynamicLandmarkTitle ? dynamicLandmarkTitle + ', ' : ''}${dynamicCityTitle} instantly.` : 'Find and book sports turfs near you.'} />
+        
+        {/* FAQ Schema for Search Page */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": `How much does it cost to book a turf on ScoreVerse?`,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The cost varies depending on the location and amenities, but you can see live pricing and book instantly directly through the ScoreVerse search platform."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I book a football ground online instantly?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes, ScoreVerse provides real-time slot availability for football turfs and cricket grounds, allowing you to book and pay online instantly."
+                }
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
+
       {/* Dynamic light glows */}
       <div 
         className="position-absolute top-0 start-50 translate-middle-x"
@@ -202,7 +328,7 @@ export default function SearchPage() {
                   <Search size={18} className="position-absolute top-50 start-0 translate-middle-y ms-3 sv-text-dim" />
                   <input
                     type="text"
-                    placeholder="Filter by name..."
+                    placeholder="Filter by name, sport, or feature..."
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
                     className="form-control text-white ps-5 py-3 border-0 rounded-3 sv-search-input"
@@ -335,7 +461,7 @@ export default function SearchPage() {
             <Search size={48} className="sv-text-primary opacity-50 mb-3" />
             <h3 className="text-white fw-bold mb-2">No Venues Match Filter</h3>
             <p className="sv-text-muted fs-6 mx-auto mb-4" style={{ maxWidth: '400px' }}>
-              No turfs match the name filter "{keyword}" in {selectedCity?.name || cityInput}. Try clearing the name filter.
+              No turfs match the filter "{keyword}" in {selectedCity?.name || cityInput}. Try clearing the filter.
             </p>
             <button onClick={() => setKeyword('')} className="btn border border-secondary text-white rounded-pill px-4">
               Clear Filter
@@ -365,6 +491,8 @@ export default function SearchPage() {
                           src={getImageUrl(turf.coverImage)} 
                           alt={turf.name}
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          loading="lazy"
+                          decoding="async"
                         />
                       ) : (
                         <div className="w-100 h-100 d-flex align-items-center justify-content-center">
