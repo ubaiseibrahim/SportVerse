@@ -1,5 +1,16 @@
 {
   "rewrites": [
+    {
+      "source": "/turf/:id",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(bot|whatsapp|facebook|twitter|linkedin|skype|slack|telegram|applebot).*"
+        }
+      ],
+      "destination": "https://api.scoreverse.in/api/turfs/share/:id"
+    },
     { "source": "/tournament/:id*", "destination": "/tournament/index.html" },
     { "source": "/match/:id*", "destination": "/match/index.html" },
     { "source": "/turf/:id*", "destination": "/turf/index.html" },
