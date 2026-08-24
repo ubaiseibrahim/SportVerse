@@ -3,7 +3,7 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/SportVerse.png'
+  '/playstore-icon.png'
 ];
 
 self.addEventListener('install', event => {

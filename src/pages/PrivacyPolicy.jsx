@@ -36,7 +36,7 @@ export default function PrivacyPolicy() {
       title: "Account Deletion",
       content: (
         <>
-          You have the right to request the deletion of your account and associated personal data at any time. To request account deletion, please email us at <a href="mailto:maazibrahimoo0@gmail.com" className="text-warning text-decoration-none fw-semibold">maazibrahimoo0@gmail.com</a> with the subject "Account Deletion Request". We process requests within 7 business days.
+          You have the right to request the deletion of your account and associated personal data at any time. To request account deletion, please email us at <a href="mailto:supportatscoreverse@gmail.com" className="text-warning text-decoration-none fw-semibold">supportatscoreverse@gmail.com</a> with the subject "Account Deletion Request". We process requests within 7 business days.
         </>
       )
     },
@@ -45,7 +45,7 @@ export default function PrivacyPolicy() {
       title: "Contact Us",
       content: (
         <>
-          If you have any questions, concerns, or requests regarding this Privacy Policy or your data, please reach out to our privacy team at <a href="mailto:maazibrahimoo0@gmail.com" className="text-warning text-decoration-none fw-semibold">maazibrahimoo0@gmail.com</a>.
+          If you have any questions, concerns, or requests regarding this Privacy Policy or your data, please reach out to our privacy team at <a href="mailto:supportatscoreverse@gmail.com" className="text-warning text-decoration-none fw-semibold">supportatscoreverse@gmail.com</a>.
         </>
       )
     }
@@ -54,9 +54,9 @@ export default function PrivacyPolicy() {
   return (
     <section className="sv-section py-24 position-relative" style={{ minHeight: '100vh', paddingTop: '120px' }}>
       <div className="container-xl position-relative z-10">
-        
-        <SectionTitle 
-          title="Privacy Policy" 
+
+        <SectionTitle
+          title="Privacy Policy"
           subtitle={`Effective Date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`}
           centered={true}
         />
@@ -96,7 +96,7 @@ export default function PrivacyPolicy() {
 
           {/* Content Area */}
           <div className="col-12 col-lg-8">
-            <div 
+            <div
               className="p-4 p-md-5 rounded-4 h-100"
               style={{
                 background: 'rgba(255, 255, 255, 0.02)',
@@ -118,7 +118,7 @@ export default function PrivacyPolicy() {
                     </div>
                     <h3 className="text-white fw-bold m-0 fs-3">{sections[activeTab].title}</h3>
                   </div>
-                  
+
                   <p className="text-white-50 fs-5 mb-0" style={{ lineHeight: '1.8' }}>
                     {sections[activeTab].content}
                   </p>
