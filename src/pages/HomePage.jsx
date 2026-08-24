@@ -1,5 +1,6 @@
 import { Suspense, lazy } from 'react'
 import HeroSection from '../sections/HeroSection'
+import SearchPage from './SearchPage'
 import SectionDivider from '../components/SectionDivider'
 
 // Lazy-load heavier sections for faster initial load
@@ -26,6 +27,11 @@ export default function HomePage({ onDownloadClick }) {
     <>
       {/* Hero Section */}
       <HeroSection onDownloadClick={onDownloadClick} />
+
+      {/* Book Turf / Search Section */}
+      <div id="book-turf">
+        <SearchPage />
+      </div>
 
       <Suspense fallback={<div className="h-32" />}>
         <AboutSection />

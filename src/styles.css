@@ -1433,7 +1433,7 @@ button { font-family: var(--font-body); }
   position: fixed;
   top: 0; left: 0;
   pointer-events: none;
-  z-index: 10000;
+  z-index: 999999;
   border-radius: 50%;
   will-change: transform;
 }

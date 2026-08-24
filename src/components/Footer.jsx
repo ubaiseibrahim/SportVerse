@@ -125,7 +125,7 @@ export default function Footer({ onDownloadClick }) {
         <hr className="sv-footer-divider" />
 
         <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3" style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>
-          <p className="mb-0">© {new Date().getFullYear()} ScoreVerse Technologies Pvt. Ltd. All rights reserved.</p>
+          <p className="mb-0">© {new Date().getFullYear()} ScoreVerse. All rights reserved.</p>
           <div className="d-flex gap-4">
             <a href="/privacy-policy" className="sv-footer-link mb-0" style={{ fontSize: '0.8rem' }}>Privacy Policy</a>
             <a href="/terms" className="sv-footer-link mb-0" style={{ fontSize: '0.8rem' }}>Terms of Service</a>
