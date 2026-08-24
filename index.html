@@ -9,6 +9,13 @@
     <meta name="author" content="ScoreVerse" />
     <meta name="theme-color" content="#FFD400" />
     
+    <!-- PWA / Apple iOS Meta Tags -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ScoreVerse" />
+    <link rel="apple-touch-icon" href="/SportVerse.png" />
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://scoreverse.in/" />
@@ -33,5 +40,14 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main-home.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>
   </body>
 </html>
