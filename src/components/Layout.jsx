@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import Navbar from './Navbar'
 import Footer from './Footer'
-import LaunchBanner from './LaunchBanner'
 import AppDownloadModal from './AppDownloadModal'
 import ScrollToTop from './ScrollToTop'
 import SmoothScroll from './SmoothScroll'
@@ -19,7 +18,6 @@ export default function Layout({ children, isLegalPage = false }) {
       <CinematicCursor />
       <ScrollToTop />
       <header className="sticky-top w-100" style={{ zIndex: 1050 }}>
-        <LaunchBanner onNotifyClick={handleOpenModal} />
         {!isLegalPage && <Navbar onDownloadClick={handleOpenModal} />}
       </header>
 
