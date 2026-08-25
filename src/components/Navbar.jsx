@@ -225,9 +225,9 @@ export default function Navbar({ onDownloadClick }) {
         {open && (
           <motion.div
             key="mobile-menu"
-            initial={{ opacity: 0, y: -12, scale: 0.97, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -12, scale: 0.97, filter: 'blur(8px)' }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             style={{
               position: 'absolute',
@@ -235,7 +235,7 @@ export default function Navbar({ onDownloadClick }) {
               left: 16, right: 16,
               borderRadius: 20,
               padding: '12px 8px',
-              background: '#000000',
+              background: 'rgba(0, 0, 0, 0.95)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               boxShadow: '0 20px 60px rgba(0,0,0,0.8)',
             }}
