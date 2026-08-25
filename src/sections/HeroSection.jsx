@@ -187,8 +187,8 @@ export default function HeroSection({ onDownloadClick }) {
                         const { latitude, longitude } = position.coords;
                         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
                         const data = await res.json();
-                        const city = data.address?.city || data.address?.state_district || data.address?.town || 'mumbai';
-                        window.location.href = `/sports-turfs-in-${city.toLowerCase().replace(/\\s+/g, '-')}`;
+                        const city = data.address?.city || data.address?.state_district || data.address?.town || data.address?.county || 'mumbai';
+                        window.location.href = `/sports-turfs-in-${city.toLowerCase().replace(/\s+/g, '-')}`;
                       } catch (err) {
                         window.location.href = '/search';
                       }
