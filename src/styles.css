@@ -1459,3 +1459,8 @@ html.sv-cursor-on button,
 html.sv-cursor-on [role="button"] {
   cursor: none;
 }
+
+/* ── Dashboard loading spinner ─────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
