@@ -1,7 +1,7 @@
 const sharp = require('sharp');
 const path = require('path');
 
-const inputPath = path.join(__dirname, 'public/SportVerse.png');
+const inputPath = path.join(__dirname, 'public/playstore-icon.png');
 const outputPath = path.join(__dirname, 'public/favicon-round.png');
 
 async function createRoundFavicon() {
