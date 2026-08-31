@@ -1,9 +1,37 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MapPin, ArrowRight, Download, Calendar, Clock, Sparkles, Check, AlertTriangle } from 'lucide-react'
+import { MapPin, ArrowRight, Download, Calendar, Clock, Sparkles, Check, AlertTriangle, Sun, Moon, Sunrise, Sunset, Layers } from 'lucide-react'
 import { API_BASE_URL, getImageUrl } from '../utils/api'
 import AuthModal from '../components/AuthModal'
 import { Helmet } from 'react-helmet-async'
+
+const getTimeGroup = (timeStr) => {
+  if (!timeStr) return 'morning'
+  const hour = parseInt(timeStr.split(':')[0], 10)
+  if (hour >= 0 && hour < 6) return 'early_morning'
+  if (hour >= 6 && hour < 12) return 'morning'
+  if (hour >= 12 && hour < 16) return 'afternoon'
+  if (hour >= 16 && hour < 20) return 'evening'
+  return 'night'
+}
+
+const isPastSlot = (dateStr, startTime) => {
+  if (!dateStr || !startTime) return false
+  const [h, m] = startTime.split(':').map(Number)
+  const now = new Date()
+  const [year, month, day] = dateStr.split('-').map(Number)
+  const slotDate = new Date(year, month - 1, day, h, m, 0, 0)
+  return slotDate.getTime() <= now.getTime()
+}
+
+const TIME_TABS = [
+  { key: 'all', label: 'All Slots', icon: Layers },
+  { key: 'early_morning', label: 'Early Morning', sub: '12-6 AM', icon: Sunrise },
+  { key: 'morning', label: 'Morning', sub: '6-12 PM', icon: Sun },
+  { key: 'afternoon', label: 'Afternoon', sub: '12-4 PM', icon: Sun },
+  { key: 'evening', label: 'Evening', sub: '4-8 PM', icon: Sunset },
+  { key: 'night', label: 'Night', sub: '8-12 AM', icon: Moon }
+]
 
 export default function TurfRedirect() {
   const pathParts = window.location.pathname.split('/').filter(Boolean)
@@ -21,6 +49,8 @@ export default function TurfRedirect() {
   const [selectedSlots, setSelectedSlots] = useState([]) // Array of slot objects
   const [loadingSlots, setLoadingSlots] = useState(false)
   const [platformFeePercent, setPlatformFeePercent] = useState(5)
+  const [selectedIntervalMode, setSelectedIntervalMode] = useState('60')
+  const [activeTimeTab, setActiveTimeTab] = useState('all')
   
   // Auth states
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -77,7 +107,10 @@ export default function TurfRedirect() {
     for (let i = 0; i < 7; i++) {
       const d = new Date(today)
       d.setDate(today.getDate() + i)
-      const dateStr = d.toISOString().split('T')[0] // YYYY-MM-DD
+      const year = d.getFullYear()
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      const day = String(d.getDate()).padStart(2, '0')
+      const dateStr = `${year}-${month}-${day}` // YYYY-MM-DD local format
       const options = { weekday: 'short', day: 'numeric', month: 'short' }
       const label = d.toLocaleDateString('en-IN', options)
       generatedDates.push({ dateStr, label })
@@ -101,7 +134,11 @@ export default function TurfRedirect() {
         const response = await fetch(`${API_BASE_URL}/turfs/${turfId}`)
         if (!response.ok) throw new Error('Failed to fetch')
         const data = await response.json()
-        setTurfData(data.data || data)
+        const turf = data.data || data
+        setTurfData(turf)
+        if (turf.bookingMode === '30_min') {
+          setSelectedIntervalMode('30')
+        }
       } catch (err) {
         console.error('Error fetching turf:', err)
         setError(true)
@@ -138,8 +175,26 @@ export default function TurfRedirect() {
     }
   }, [turfId, selectedDate])
 
+  const databaseHas30MinSlots = React.useMemo(() => {
+    if (!slots || slots.length === 0) return false
+    return slots.some((s) => {
+      const [startH, startM] = s.startTime.split(':').map(Number)
+      const [endH, endM] = s.endTime.split(':').map(Number)
+      const diff = (endH * 60 + endM) - (startH * 60 + startM)
+      return diff === 30 || diff === -1380
+    })
+  }, [slots])
+
+  useEffect(() => {
+    if (slots && slots.length > 0 && !databaseHas30MinSlots) {
+      setSelectedIntervalMode('60')
+    }
+  }, [slots, databaseHas30MinSlots])
+
   const handleCustomDateSelect = (dateStr) => {
-    const d = new Date(dateStr)
+    if (!dateStr) return
+    const [year, month, day] = dateStr.split('-').map(Number)
+    const d = new Date(year, month - 1, day)
     const options = { weekday: 'short', day: 'numeric', month: 'short' }
     const label = d.toLocaleDateString('en-IN', options)
     
@@ -161,17 +216,107 @@ export default function TurfRedirect() {
     return `${formattedHour}:${minStr} ${ampm}`
   }
 
-  const toggleSlotSelection = (slot) => {
-    if (slot.status !== 'available') return
-    
-    setSelectedSlots((prev) => {
-      const exists = prev.find((s) => s._id === slot._id)
-      if (exists) {
-        return prev.filter((s) => s._id !== slot._id)
+  // Processed slots with 30m / 60m merging logic matching SlotPickerScreen
+  const processedSlots = React.useMemo(() => {
+    if (!slots || slots.length === 0) return []
+    let finalSlots = slots
+
+    if (selectedIntervalMode === '60' && databaseHas30MinSlots) {
+      const merged = []
+      const sorted = [...slots].sort((a, b) => a.startTime.localeCompare(b.startTime))
+      let i = 0
+      while (i < sorted.length) {
+        const slot1 = sorted[i]
+        const slot2 = sorted[i + 1]
+        if (slot2 && slot1.endTime === slot2.startTime) {
+          let discountPrice = null
+          if ((slot1.discountPrice !== undefined && slot1.discountPrice !== null) || 
+              (slot2.discountPrice !== undefined && slot2.discountPrice !== null)) {
+            const p1 = slot1.discountPrice !== undefined && slot1.discountPrice !== null ? slot1.discountPrice : slot1.price
+            const p2 = slot2.discountPrice !== undefined && slot2.discountPrice !== null ? slot2.discountPrice : slot2.price
+            discountPrice = p1 + p2
+          }
+          merged.push({
+            _id: `${slot1._id}_${slot2._id}`,
+            isMerged: true,
+            originalSlots: [slot1, slot2],
+            startTime: slot1.startTime,
+            endTime: slot2.endTime,
+            price: slot1.price + slot2.price,
+            discountPrice,
+            status: (slot1.status === 'available' && slot2.status === 'available') ? 'available' : 'booked',
+          })
+          i += 2
+        } else {
+          i++
+        }
+      }
+      finalSlots = merged
+    }
+
+    return finalSlots
+  }, [slots, selectedIntervalMode, databaseHas30MinSlots])
+
+  // Filter slots for the active time tab
+  const visibleSlots = React.useMemo(() => {
+    if (activeTimeTab === 'all') return processedSlots
+    return processedSlots.filter((s) => getTimeGroup(s.startTime) === activeTimeTab)
+  }, [processedSlots, activeTimeTab])
+
+  // Calculate available counts per tab
+  const tabCounts = React.useMemo(() => {
+    const counts = { all: 0, early_morning: 0, morning: 0, afternoon: 0, evening: 0, night: 0 }
+    processedSlots.forEach((slot) => {
+      const past = isPastSlot(selectedDate, slot.startTime)
+      let isAvail = false
+      if (slot.isMerged) {
+        const s1Booked = slot.originalSlots[0].status !== 'available' || isPastSlot(selectedDate, slot.originalSlots[0].startTime)
+        const s2Booked = slot.originalSlots[1].status !== 'available' || isPastSlot(selectedDate, slot.originalSlots[1].startTime)
+        isAvail = !s1Booked || !s2Booked
       } else {
-        return [...prev, slot]
+        isAvail = slot.status === 'available' && !past
+      }
+      if (isAvail) {
+        counts.all++
+        const group = getTimeGroup(slot.startTime)
+        if (counts[group] !== undefined) counts[group]++
       }
     })
+    return counts
+  }, [processedSlots, selectedDate])
+
+  const toggleSlotSelection = (slot) => {
+    if (slot.isMerged) {
+      const s1Booked = slot.originalSlots[0].status !== 'available' || isPastSlot(selectedDate, slot.originalSlots[0].startTime)
+      const s2Booked = slot.originalSlots[1].status !== 'available' || isPastSlot(selectedDate, slot.originalSlots[1].startTime)
+      const isPartiallyBooked = (s1Booked && !s2Booked) || (!s1Booked && s2Booked)
+
+      if (isPartiallyBooked) {
+        setSelectedIntervalMode('30')
+        return
+      }
+
+      if (slot.status !== 'available' || isPastSlot(selectedDate, slot.startTime)) return
+
+      const allSelected = slot.originalSlots.every((os) => selectedSlots.some((s) => s._id === os._id))
+      if (allSelected) {
+        const idsToRemove = slot.originalSlots.map((os) => os._id)
+        setSelectedSlots((prev) => prev.filter((s) => !idsToRemove.includes(s._id)))
+      } else {
+        const toAdd = slot.originalSlots.filter((os) => !selectedSlots.some((s) => s._id === os._id))
+        setSelectedSlots((prev) => [...prev, ...toAdd])
+      }
+    } else {
+      if (slot.status !== 'available' || isPastSlot(selectedDate, slot.startTime)) return
+      setSelectedSlots((prev) => {
+        const exists = prev.find((s) => s._id === slot._id)
+        if (exists) {
+          return prev.filter((s) => s._id !== slot._id)
+        } else {
+          return [...prev, slot]
+        }
+      })
+    }
   }
 
   // Load Razorpay Checkout library dynamically
@@ -355,7 +500,7 @@ export default function TurfRedirect() {
 
   // Calculate pricing breakdown
   const calculateTotalBase = () => {
-    return selectedSlots.reduce((sum, slot) => sum + (slot.discountPrice || slot.price), 0)
+    return selectedSlots.reduce((sum, slot) => sum + (slot.discountPrice !== undefined && slot.discountPrice !== null ? slot.discountPrice : slot.price), 0)
   }
 
   const calculatePlatformFee = () => {
@@ -531,7 +676,7 @@ export default function TurfRedirect() {
                       </p>
                     )}
 
-                    {/* New Share Button */}
+                    {/* Share Button */}
                     <button
                       onClick={() => {
                         const shareUrl = `https://scoreverse.in/turf/${turfId}`
@@ -592,7 +737,7 @@ export default function TurfRedirect() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5 }}
-                className="rounded-4 border p-3 d-flex flex-column h-100"
+                className="rounded-4 border p-3 p-md-4 d-flex flex-column h-100"
                 style={{
                   background: 'rgba(255, 255, 255, 0.02)',
                   borderColor: 'rgba(255, 255, 255, 0.06)',
@@ -600,211 +745,390 @@ export default function TurfRedirect() {
                   backdropFilter: 'blur(20px)'
                 }}
               >
-                <div className="d-flex align-items-center justify-content-between mb-3">
+                {/* ── Header ── */}
+                <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                   <div className="d-flex align-items-center gap-2">
-                    <Calendar size={16} className="sv-text-primary" />
-                    <h3 className="text-white fw-bold mb-0" style={{ fontSize: '1.1rem' }}>Select Booking Schedule</h3>
+                    <span style={{
+                      width: 28, height: 28, borderRadius: '8px',
+                      background: 'rgba(255,212,0,0.12)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                      <Calendar size={14} className="sv-text-primary" />
+                    </span>
+                    <h3 className="text-white fw-bold mb-0" style={{ fontSize: '1rem', letterSpacing: '-0.01em' }}>Book Your Slot</h3>
                   </div>
 
-                  {/* Custom Date Input Picker */}
-                  <div className="position-relative">
-                    <input
-                      ref={dateInputRef}
-                      type="date"
-                      min={new Date().toISOString().split('T')[0]}
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          handleCustomDateSelect(e.target.value)
-                        }
+                  {/* Native date picker */}
+                  <div className="position-relative d-inline-block">
+                    <button
+                      type="button"
+                      className="d-flex align-items-center gap-1 border text-white"
+                      style={{
+                        background: 'rgba(255,212,0,0.07)',
+                        borderColor: 'rgba(255,212,0,0.25)',
+                        borderRadius: '20px',
+                        padding: '4px 12px',
+                        fontSize: '0.72rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        position: 'relative',
+                        overflow: 'hidden'
                       }}
-                      className="position-absolute opacity-0 start-0 top-0 w-100 h-100"
-                      style={{ pointerEvents: 'none' }}
-                    />
-                    <button 
-                      onClick={() => dateInputRef.current?.showPicker()}
-                      className="btn btn-sm border border-secondary text-white rounded-pill px-3 py-1.5 d-flex align-items-center gap-1 hover-white"
-                      style={{ backgroundColor: 'rgba(255,255,255,0.02)', fontSize: '0.8rem', zIndex: 10 }}
                     >
-                      <Calendar size={12} className="sv-text-primary" />
-                      <span>Custom...</span>
+                      <Calendar size={11} className="sv-text-primary" />
+                      <span>Custom Date</span>
+                      <input
+                        ref={dateInputRef}
+                        type="date"
+                        min={new Date().toISOString().split('T')[0]}
+                        value={selectedDate || ''}
+                        onChange={(e) => { if (e.target.value) handleCustomDateSelect(e.target.value) }}
+                        onClick={(e) => { try { if (typeof e.target.showPicker === 'function') e.target.showPicker() } catch (_) {} }}
+                        className="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                        style={{ cursor: 'pointer', zIndex: 10, pointerEvents: 'auto' }}
+                        aria-label="Select custom date"
+                      />
                     </button>
                   </div>
                 </div>
 
-                {/* Horizontal Date Picker */}
-                <div className="d-flex gap-2 overflow-auto pb-3 mb-4 scrollbar-thin" style={{ whiteSpace: 'nowrap' }}>
+                {/* ── Date Pills (wrapping, no horizontal scroll) ── */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
                   {dates.map(({ dateStr, label }) => {
                     const isSelected = selectedDate === dateStr
+                    const parts = label.split(' ')
+                    const dayName = parts[0]  // e.g. Mon,
+                    const dayNum = parts[1]   // e.g. 31
+                    const mon = parts[2]      // e.g. Aug
                     return (
                       <button
                         key={dateStr}
                         onClick={() => setSelectedDate(dateStr)}
-                        className="btn py-1.5 px-2 rounded-3 text-center d-inline-block border"
                         style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '6px 10px',
+                          borderRadius: '10px',
+                          border: `1.5px solid ${isSelected ? 'var(--sv-gold)' : 'rgba(255,255,255,0.08)'}`,
                           background: isSelected ? 'var(--sv-gold)' : 'rgba(255,255,255,0.02)',
                           color: isSelected ? '#000' : '#fff',
-                          borderColor: isSelected ? 'var(--sv-gold)' : 'rgba(255,255,255,0.08)',
-                          minWidth: '75px',
-                          transition: 'all 0.15s'
+                          cursor: 'pointer',
+                          transition: 'all 0.15s',
+                          minWidth: '48px',
+                          gap: '1px'
                         }}
                       >
-                        <div style={{ fontSize: '9px', textTransform: 'uppercase', opacity: isSelected ? 0.7 : 0.5 }}>
-                          {label.split(' ')[0]}
-                        </div>
-                        <div className="fw-bold fs-7">
-                          {label.split(' ')[1]} {label.split(' ')[2]}
-                        </div>
+                        <span style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', opacity: isSelected ? 0.7 : 0.45, letterSpacing: '0.4px' }}>
+                          {dayName?.replace(',', '')}
+                        </span>
+                        <span style={{ fontSize: '15px', fontWeight: 800, lineHeight: 1.1 }}>{dayNum}</span>
+                        <span style={{ fontSize: '9px', fontWeight: 600, opacity: isSelected ? 0.7 : 0.45 }}>{mon}</span>
                       </button>
                     )
                   })}
                 </div>
 
-                {/* Slots Grid Area */}
-                <div className="flex-grow-1 mb-4">
-                  <h4 className="text-white fs-7 fw-semibold mb-3">Available Hourly Slots</h4>
-
-                  {loadingSlots ? (
-                    <div className="text-center py-5">
-                      <div className="spinner-border spinner-border-sm sv-text-primary" role="status" />
-                      <p className="sv-text-muted fs-7 mt-2">Fetching open slots...</p>
+                {/* ── Slot Duration Toggle ── */}
+                {(turfData?.bookingMode === 'both' || databaseHas30MinSlots) && (
+                  <div
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      background: 'rgba(255,255,255,0.02)',
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      borderRadius: '10px',
+                      padding: '4px 10px',
+                      marginBottom: '10px'
+                    }}
+                  >
+                    <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>Duration</span>
+                    <div style={{ display: 'flex', gap: '3px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', padding: '2px' }}>
+                      {[['60', '1 Hour'], ['30', '30 Min']].map(([val, lbl]) => (
+                        <button key={val}
+                          onClick={() => { setSelectedIntervalMode(val); setSelectedSlots([]) }}
+                          style={{
+                            padding: '3px 10px',
+                            borderRadius: '6px',
+                            border: 'none',
+                            background: selectedIntervalMode === val ? 'var(--sv-gold)' : 'transparent',
+                            color: selectedIntervalMode === val ? '#000' : 'rgba(255,255,255,0.5)',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            transition: 'all 0.15s'
+                          }}
+                        >{lbl}</button>
+                      ))}
                     </div>
-                  ) : slots.length === 0 ? (
-                    <div className="text-center py-4 border border-secondary rounded-3" style={{ background: 'rgba(255,255,255,0.01)' }}>
-                      <Clock size={28} className="sv-text-primary opacity-30 mb-2" />
-                      <p className="sv-text-muted fs-7 mb-0">No slots defined for this date. Check another date.</p>
+                  </div>
+                )}
+
+                {/* ── Partial dot legend ── */}
+                {selectedIntervalMode === '60' && databaseHas30MinSlots && (
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '5px 10px',
+                    borderRadius: '8px',
+                    background: 'rgba(255, 152, 0, 0.07)',
+                    border: '1px solid rgba(255, 152, 0, 0.2)',
+                    marginBottom: '10px'
+                  }}>
+                    <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#FF9800', flexShrink: 0, boxShadow: '0 0 5px rgba(255,152,0,0.8)' }} />
+                    <span style={{ fontSize: '10.5px', color: '#ffb74d', lineHeight: 1.3 }}>
+                      Orange dot = partially booked — tap to switch to 30 min view
+                    </span>
+                  </div>
+                )}
+
+                {/* ── Time Filter Tabs (wrapping pills) ── */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginBottom: '12px' }}>
+                  {TIME_TABS.map((tab) => {
+                    const isActive = activeTimeTab === tab.key
+                    const count = tabCounts[tab.key] || 0
+                    const IconComp = tab.icon
+                    return (
+                      <button
+                        key={tab.key}
+                        onClick={() => setActiveTimeTab(tab.key)}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: '4px',
+                          padding: '4px 9px',
+                          borderRadius: '16px',
+                          border: `1.5px solid ${isActive ? 'var(--sv-gold)' : 'rgba(255,255,255,0.08)'}`,
+                          background: isActive ? 'var(--sv-gold)' : 'rgba(255,255,255,0.02)',
+                          color: isActive ? '#000' : 'rgba(255,255,255,0.7)',
+                          fontSize: '11px',
+                          fontWeight: isActive ? 700 : 500,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        <IconComp size={11} style={{ color: isActive ? '#000' : 'var(--sv-gold)' }} />
+                        <span>{tab.key === 'all' ? 'All' : tab.key === 'early_morning' ? 'Early' : tab.label.split(' ')[0]}</span>
+                        {count > 0 && (
+                          <span style={{
+                            background: isActive ? 'rgba(0,0,0,0.18)' : 'rgba(255,212,0,0.15)',
+                            color: isActive ? '#000' : 'var(--sv-gold)',
+                            borderRadius: '10px',
+                            padding: '0 5px',
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            lineHeight: '16px'
+                          }}>{count}</span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {/* ── Slots grid ── */}
+                <div className="flex-grow-1 mb-3">
+                  {loadingSlots ? (
+                    <div className="text-center py-4">
+                      <div className="spinner-border spinner-border-sm sv-text-primary" role="status" />
+                      <p className="sv-text-muted mt-2" style={{ fontSize: '12px' }}>Fetching slots…</p>
+                    </div>
+                  ) : visibleSlots.length === 0 ? (
+                    <div className="text-center py-4" style={{ border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', background: 'rgba(255,255,255,0.01)' }}>
+                      <Clock size={24} className="sv-text-primary opacity-30 mb-2" />
+                      <p className="sv-text-muted mb-0" style={{ fontSize: '12px' }}>
+                        {activeTimeTab === 'all' ? 'No slots for this date. Try another.' : 'No slots in this period.'}
+                      </p>
                     </div>
                   ) : (
-                    <motion.div 
-                      className="row row-cols-3 row-cols-sm-3 row-cols-md-4 g-2"
+                    <motion.div
+                      key={`${selectedDate}-${selectedIntervalMode}-${activeTimeTab}`}
                       initial="hidden"
                       animate="show"
                       variants={{
                         hidden: { opacity: 0 },
-                        show: {
-                          opacity: 1,
-                          transition: { staggerChildren: 0.05 }
-                        }
+                        show: { opacity: 1, transition: { staggerChildren: 0.025 } }
+                      }}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                        gap: '6px'
                       }}
                     >
-                      {slots.map((slot) => {
-                        const isSelected = selectedSlots.some((s) => s._id === slot._id)
-                        
-                        // Check if slot startTime is in the past for today
-                        const todayStr = new Date().toISOString().split('T')[0]
-                        const isToday = selectedDate === todayStr
-                        const slotHour = parseInt(slot.startTime.split(':')[0], 10)
-                        const isPastHour = isToday && slotHour <= new Date().getHours()
+                      {visibleSlots.map((slot) => {
+                        const isSelected = slot.isMerged
+                          ? slot.originalSlots.every((os) => selectedSlots.some((s) => s._id === os._id))
+                          : selectedSlots.some((s) => s._id === slot._id)
 
-                        const isAvailable = slot.status === 'available' && !isPastHour
-                        const isBooked = slot.status === 'booked' || slot.status === 'offline_booking'
-                        
+                        const past = isPastSlot(selectedDate, slot.startTime)
+
+                        const isPartiallyBooked = slot.isMerged && (() => {
+                          const s1B = slot.originalSlots[0].status !== 'available' || isPastSlot(selectedDate, slot.originalSlots[0].startTime)
+                          const s2B = slot.originalSlots[1].status !== 'available' || isPastSlot(selectedDate, slot.originalSlots[1].startTime)
+                          return (s1B && !s2B) || (!s1B && s2B)
+                        })()
+
+                        const isBooked = (slot.status === 'booked' || slot.status === 'offline_booking' || slot.status === 'offline') && !isPartiallyBooked
+                        const isAvailable = (slot.status === 'available' && !past) || isPartiallyBooked
+
+                        // Colour tokens
+                        let bg, border, textColor
+                        if (isSelected) {
+                          bg = 'linear-gradient(135deg, #FFD400 0%, #ffe566 100%)'
+                          border = 'var(--sv-gold)'
+                          textColor = '#000'
+                        } else if (isPartiallyBooked) {
+                          bg = 'rgba(255,152,0,0.07)'
+                          border = 'rgba(255,152,0,0.45)'
+                          textColor = '#fff'
+                        } else if (isBooked || past) {
+                          bg = 'rgba(255,255,255,0.015)'
+                          border = 'rgba(255,255,255,0.04)'
+                          textColor = 'rgba(255,255,255,0.25)'
+                        } else {
+                          bg = 'rgba(255,255,255,0.03)'
+                          border = 'rgba(255,255,255,0.1)'
+                          textColor = '#fff'
+                        }
+
+                        const timeLabel = `${formatTimeTo12Hour(slot.startTime)} – ${formatTimeTo12Hour(slot.endTime)}`
+                        const hasDiscount = slot.discountPrice !== undefined && slot.discountPrice !== null
+
                         return (
-                          <motion.div 
-                            key={slot._id} 
-                            className="col"
+                          <motion.button
+                            key={slot._id}
                             variants={{
-                              hidden: { opacity: 0, y: 15 },
-                              show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+                              hidden: { opacity: 0, scale: 0.9 },
+                              show: { opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 320, damping: 22 } }
+                            }}
+                            whileHover={isAvailable ? { scale: 1.04, boxShadow: '0 4px 16px rgba(255,212,0,0.18)' } : {}}
+                            whileTap={isAvailable ? { scale: 0.95 } : {}}
+                            disabled={!isAvailable}
+                            onClick={() => toggleSlotSelection(slot)}
+                            style={{
+                              position: 'relative',
+                              padding: '7px 6px',
+                              borderRadius: '10px',
+                              border: `1.5px solid ${border}`,
+                              background: bg,
+                              color: textColor,
+                              cursor: isAvailable ? 'pointer' : 'not-allowed',
+                              opacity: (isBooked || past) ? 0.4 : 1,
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '2px',
+                              transition: 'border 0.15s, background 0.15s',
+                              boxShadow: isSelected ? '0 6px 20px rgba(255,212,0,0.22)' : 'none',
+                              overflow: 'hidden'
                             }}
                           >
-                            <motion.button
-                              whileHover={isAvailable ? { scale: 1.05, boxShadow: '0 5px 15px rgba(255,212,0,0.15)' } : {}}
-                              whileTap={isAvailable ? { scale: 0.95 } : {}}
-                              disabled={!isAvailable}
-                              onClick={() => toggleSlotSelection(slot)}
-                              className={`w-100 py-2 px-1 rounded-3 border text-center transition-all d-flex flex-column align-items-center justify-content-center position-relative overflow-hidden ${isSelected ? 'text-black fw-bold' : ''}`}
-                              style={{
-                                borderColor: isSelected 
-                                  ? 'var(--sv-gold)' 
-                                  : isBooked || isPastHour
-                                    ? 'rgba(255,255,255,0.02)' 
-                                    : 'rgba(255,255,255,0.12)',
-                                background: isSelected 
-                                  ? 'linear-gradient(135deg, var(--sv-gold) 0%, #ffea70 100%)'
-                                  : isBooked || isPastHour
-                                    ? 'rgba(255, 255, 255, 0.02)' 
-                                    : 'rgba(255,255,255,0.05)',
-                                opacity: (isBooked || isPastHour) ? 0.35 : 1,
-                                cursor: isAvailable ? 'pointer' : 'not-allowed',
-                                backdropFilter: 'blur(10px)',
-                                boxShadow: isSelected ? '0 10px 30px rgba(255,212,0,0.25)' : 'none'
-                              }}
-                            >
-                              {/* Selection glow indicator */}
-                              {isSelected && (
-                                <motion.div 
-                                  layoutId="outline"
-                                  className="position-absolute top-0 start-0 w-100 h-100 rounded-3"
-                                  style={{ border: '2px solid rgba(255,255,255,0.5)', pointerEvents: 'none' }}
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  exit={{ opacity: 0 }}
-                                />
-                              )}
-                              <span className={isSelected ? 'text-black fw-black' : 'text-light fw-medium'} style={{ fontSize: '0.75rem', zIndex: 1 }}>
-                                {formatTimeTo12Hour(slot.startTime)} - {formatTimeTo12Hour(slot.endTime)}
+                            {/* Partial booking dot */}
+                            {isPartiallyBooked && (
+                              <span style={{
+                                position: 'absolute', top: 5, right: 5,
+                                width: 6, height: 6, borderRadius: '50%',
+                                background: '#FF9800',
+                                boxShadow: '0 0 5px rgba(255,152,0,0.9)'
+                              }} />
+                            )}
+
+                            {/* Selected checkmark */}
+                            {isSelected && (
+                              <span style={{
+                                position: 'absolute', top: 4, right: 5,
+                                width: 14, height: 14, borderRadius: '50%',
+                                background: 'rgba(0,0,0,0.2)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                              }}>
+                                <Check size={8} color="#000" strokeWidth={3} />
                               </span>
-                              <span className="mt-1" style={{ fontSize: '0.65rem', color: isSelected ? 'rgba(0,0,0,0.7)' : 'var(--sv-text-muted)', fontWeight: isSelected ? '800' : '600', zIndex: 1 }}>
-                                {isBooked ? 'Booked' : isPastHour ? 'Passed' : `₹${slot.discountPrice || slot.price}`}
+                            )}
+
+                            {/* Time */}
+                            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '-0.2px', lineHeight: 1.2, textAlign: 'center' }}>
+                              {timeLabel.split(' – ')[0]}
+                            </span>
+                            <span style={{ fontSize: '10px', fontWeight: 500, opacity: 0.6 }}>
+                              – {timeLabel.split(' – ')[1]}
+                            </span>
+
+                            {/* Status / Price */}
+                            {isBooked ? (
+                              <span style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>Booked</span>
+                            ) : past ? (
+                              <span style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>Passed</span>
+                            ) : isPartiallyBooked ? (
+                              <span style={{ fontSize: '9.5px', color: '#ffb74d', fontWeight: 700 }}>Partial</span>
+                            ) : hasDiscount ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                <span style={{ fontSize: '9px', textDecoration: 'line-through', opacity: 0.5, color: isSelected ? '#333' : '#aaa' }}>₹{slot.price}</span>
+                                <span style={{ fontSize: '10px', fontWeight: 800, color: isSelected ? '#000' : '#2ed573' }}>₹{slot.discountPrice}</span>
+                              </div>
+                            ) : (
+                              <span style={{ fontSize: '10px', fontWeight: isSelected ? 800 : 600, color: isSelected ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.55)' }}>
+                                ₹{slot.price}
                               </span>
-                            </motion.button>
-                          </motion.div>
+                            )}
+                          </motion.button>
                         )
                       })}
                     </motion.div>
                   )}
                 </div>
 
-                {/* Booking Pricing Breakdown basket */}
+                {/* ── Pricing Summary ── */}
                 {selectedSlots.length > 0 && (
                   <motion.div
-                    initial={{ opacity: 0, y: 15 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-2 px-3 rounded-3 mb-2 border"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      borderColor: 'rgba(255, 255, 255, 0.06)'
+                      background: 'rgba(255,255,255,0.025)',
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      borderRadius: '12px',
+                      padding: '10px 14px',
+                      marginBottom: '10px'
                     }}
                   >
-                    <div className="d-flex justify-content-between fs-8 mb-1">
-                      <span className="sv-text-muted">Selected Slots ({selectedSlots.length})</span>
-                      <span className="text-white fw-medium">₹{calculateTotalBase()}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: 4 }}>
+                      <span style={{ color: 'rgba(255,255,255,0.45)' }}>
+                        {selectedIntervalMode === '60' && databaseHas30MinSlots
+                          ? `${selectedSlots.length / 2} hr`
+                          : `${selectedSlots.length} slot${selectedSlots.length > 1 ? 's' : ''}`
+                        }
+                      </span>
+                      <span className="text-white fw-semibold">₹{calculateTotalBase()}</span>
                     </div>
-                    <div className="d-flex justify-content-between fs-8 mb-2">
-                      <span className="sv-text-muted">Platform Fee ({platformFeePercent}%)</span>
-                      <span className="text-white fw-medium">+ ₹{calculatePlatformFee()}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: 6 }}>
+                      <span style={{ color: 'rgba(255,255,255,0.45)' }}>Platform fee ({platformFeePercent}%)</span>
+                      <span className="text-white fw-semibold">+ ₹{calculatePlatformFee()}</span>
                     </div>
-                    <div className="border-top border-secondary my-1" />
-                    <div className="d-flex justify-content-between fs-7 fw-bold mb-1">
-                      <span className="text-white">Total Amount</span>
-                      <span className="sv-text-primary">₹{calculateGrandTotal()}</span>
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 6, display: 'flex', justifyContent: 'space-between' }}>
+                      <span className="text-white fw-bold" style={{ fontSize: '13px' }}>Total</span>
+                      <span className="sv-text-primary fw-black" style={{ fontSize: '14px' }}>₹{calculateGrandTotal()}</span>
                     </div>
                   </motion.div>
                 )}
 
                 {bookingError && (
-                  <div className="alert alert-danger py-2 fs-7 mb-3 d-flex align-items-center gap-2">
-                    <AlertTriangle size={14} />
+                  <div className="alert alert-danger py-2 mb-2 d-flex align-items-center gap-2" style={{ fontSize: '12px' }}>
+                    <AlertTriangle size={13} />
                     <span>{bookingError}</span>
                   </div>
                 )}
 
-                {/* Checkout button */}
+                {/* ── Checkout Button ── */}
                 <button
                   disabled={selectedSlots.length === 0 || bookingLoading}
                   onClick={handleProceedBooking}
-                  className="sv-btn sv-btn-primary w-100 py-3 justify-content-center fw-bold fs-6 mt-auto"
-                  style={{ borderRadius: '12px' }}
+                  className="sv-btn sv-btn-primary w-100 fw-bold justify-content-center mt-auto"
+                  style={{ borderRadius: '12px', padding: '13px 20px', fontSize: '14px' }}
                 >
                   {bookingLoading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" />
-                      Processing Checkout...
-                    </>
+                    <><span className="spinner-border spinner-border-sm me-2" role="status" />Processing…</>
                   ) : !currentUser ? (
-                    'Log in with Google to Book'
+                    'Log in to Book'
+                  ) : selectedSlots.length === 0 ? (
+                    'Select a Slot'
                   ) : (
-                    `Confirm and Book (₹${selectedSlots.length > 0 ? calculateGrandTotal() : 0})`
+                    `Confirm & Pay  ₹${calculateGrandTotal()}`
                   )}
                 </button>
               </motion.div>
@@ -858,3 +1182,5 @@ export default function TurfRedirect() {
     </div>
   )
 }
+
+
