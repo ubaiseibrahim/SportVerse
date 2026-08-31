@@ -42,6 +42,19 @@ export default function TurfRedirect() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   
+  // Attempt App Redirect
+  useEffect(() => {
+    if (turfId) {
+      // If the user has the app installed but OS verification failed,
+      // this custom scheme will prompt them to open the app.
+      // If they don't have the app, this silently fails and they remain on the web booking page.
+      setTimeout(() => {
+        window.location.href = `scoreverse://turf/${turfId}`;
+      }, 500);
+    }
+  }, [turfId]);
+
+  
   // Slots & Booking states
   const [dates, setDates] = useState([])
   const [selectedDate, setSelectedDate] = useState('')
