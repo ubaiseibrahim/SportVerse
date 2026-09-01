@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const DOMAIN = 'https://scoreverse.in';
+const DOMAIN = 'https://www.scoreverse.in';
 
 // The exact hyper-local cities and regions we want Google to index
 const cities = ['chennai', 'vellore', 'ambur', 'pernambut', 'nagercoil', 'mumbai', 'bengaluru', 'hyderabad'];

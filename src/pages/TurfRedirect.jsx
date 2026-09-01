@@ -547,14 +547,14 @@ export default function TurfRedirect() {
               "@context": "https://schema.org",
               "@type": "SportsActivityLocation",
               "name": turfData.name,
-              "image": turfData.coverImage ? getImageUrl(turfData.coverImage) : "https://scoreverse.in/SportVerse.png",
+              "image": turfData.coverImage ? getImageUrl(turfData.coverImage) : "https://www.scoreverse.in/SportVerse.png",
               "description": turfData.description || `Sports turf located in ${turfData.city}.`,
               "address": {
                 "@type": "PostalAddress",
                 "addressLocality": turfData.city || "India",
                 "addressCountry": "IN"
               },
-              "url": `https://scoreverse.in/turf/${turfId}`,
+              "url": `https://www.scoreverse.in/turf/${turfId}`,
               "aggregateRating": {
                 "@type": "AggregateRating",
                 "ratingValue": turfData.rating || "4.8",
@@ -585,13 +585,13 @@ export default function TurfRedirect() {
                   "@type": "ListItem",
                   "position": 2,
                   "name": `Turfs in ${turfData.city}`,
-                  "item": `https://scoreverse.in/turfs-in-${turfData.city?.toLowerCase().replace(/\s+/g, '-')}`
+                  "item": `https://www.scoreverse.in/turfs-in-${turfData.city?.toLowerCase().replace(/\s+/g, '-')}`
                 },
                 {
                   "@type": "ListItem",
                   "position": 3,
                   "name": turfData.name,
-                  "item": `https://scoreverse.in/turf/${turfId}`
+                  "item": `https://www.scoreverse.in/turf/${turfId}`
                 }
               ]
             })}
@@ -692,7 +692,7 @@ export default function TurfRedirect() {
                     {/* Share Button */}
                     <button
                       onClick={() => {
-                        const shareUrl = `https://scoreverse.in/turf/${turfId}`
+                        const shareUrl = `https://www.scoreverse.in/turf/${turfId}`
                         if (navigator.share) {
                           navigator.share({
                             title: `${turfData.name} on ScoreVerse`,
